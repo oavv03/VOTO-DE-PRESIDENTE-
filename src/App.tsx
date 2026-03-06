@@ -36,8 +36,15 @@ const CANDIDATE_COLORS = [
   '#003366', '#0055aa', '#4caf50', '#ffeb3b', '#f44336', '#9c27b0', '#ff9800', '#795548'
 ];
 
-const CircuitDetails = ({ circuit, data }: { circuit: string; data: CircuitData }) => {
+const CircuitDetails = ({ circuit, data, province }: { circuit: string; data: CircuitData; province: string }) => {
   const participation = ((data.tec.emi / data.tec.pad) * 100).toFixed(2);
+  const circuitSummary = {
+    cen: data.tec.cen,
+    mes: data.tec.mes,
+    pad: data.tec.pad,
+    val: data.tec.val,
+    part: participation
+  };
 
   const candidateLabels = Object.keys(data.cand);
   const candidateValues = Object.values(data.cand);
@@ -53,9 +60,12 @@ const CircuitDetails = ({ circuit, data }: { circuit: string; data: CircuitData 
 
   return (
     <div className="p-4 bg-gray-50 border-t border-gray-200 animate-in fade-in slide-in-from-top-2 duration-300">
-      <div className="flex items-center gap-2 mb-4 text-blue-900 font-bold">
-        <Users size={18} />
-        <span>Participación: {participation}%</span>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2 text-blue-900 font-bold">
+          <Users size={18} />
+          <span>Participación: {participation}%</span>
+        </div>
+        <ExportMenu province={province} summary={circuitSummary} data={data} circuit={circuit} />
       </div>
 
       <div className="mb-6">
@@ -252,7 +262,7 @@ const ProvinceCard = ({ province, data, index }: ProvinceCardProps) => {
                     {openCircuit === circ ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                   </button>
                   {openCircuit === circ && (
-                    <CircuitDetails circuit={circ} data={data[circ]} />
+                    <CircuitDetails circuit={circ} data={data[circ]} province={province} />
                   )}
                 </div>
               ))}
