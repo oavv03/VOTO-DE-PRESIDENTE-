@@ -289,7 +289,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
       doc.setPage(i);
       doc.setFontSize(10);
       doc.setTextColor(150);
-      doc.text(`Informe generado automáticamente - Página ${i} de ${pageCount}`, 105, 285, { align: 'center' });
+      doc.text(`Centro de estadística electoral - Página ${i} de ${pageCount}`, 105, 285, { align: 'center' });
     }
 
     const fileName = circuit 
