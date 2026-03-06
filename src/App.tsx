@@ -266,10 +266,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <main className="max-w-5xl mx-auto px-4 pt-8">
-        <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">
-          <strong>Nota:</strong> Los datos presentados corresponden al escrutinio oficial por provincia y circuito electoral. Seleccione una provincia para ver el desglose detallado.
-        </div>
-
         {PROVINCE_ORDER.map((province, idx) => (
           data[province] && (
             <ProvinceCard
