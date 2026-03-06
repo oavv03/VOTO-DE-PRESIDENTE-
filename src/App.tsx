@@ -303,8 +303,8 @@ export default function App() {
       </main>
 
       <footer className="max-w-5xl mx-auto px-4 py-12 text-center text-gray-400 text-xs border-t border-gray-200 mt-12">
-        <p>© 2024 Sistema de Visualización de Resultados Electorales</p>
-        <p className="mt-2">Desarrollado para fines informativos basados en datos oficiales escrutados.</p>
+        <p>© 2025 Sistema de Visualización de Resultados Electorales</p>
+        <p className="mt-2">Desarrollado por CEMD para fines informativos basados en datos oficiales escrutados.</p>
       </footer>
     </div>
   );
