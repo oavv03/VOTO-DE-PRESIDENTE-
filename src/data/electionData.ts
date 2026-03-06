@@ -82,17 +82,71 @@ Panamá Oeste;   Circuito 13.3; 34,735 ; 1,305 ; 3.76 ; 1,247 ; 58 ; 13,310 ; 38
 Panamá Oeste;   Circuito 13.4; 120,688 ; 3,838 ; 3.18 ; 3,606 ; 232 ; 46,955 ; 38.91 ; 40,823 ; 6,132 ; 8,249 ; 6.83 ; 4,661 ;3588; 34,234 ; 28.37 ; 20,516 ; 17.00 ; 279 ; 4.55 ; 147 ; 132 ; 5,224 ; 4.33 ; 1,393 ; 1.15 ; 12,721 ; 27.09 
 Voto Adelantado;Voto Adelantado; 4,104 ; 87 ; 2.12 ; 86 ; 1 ; 459 ; 11.18 ; 389 ; 70 ; 268 ; 6.53 ; 151 ;117; 2,583 ; 62.94 ; 543 ; 13.23 ; 34 ; 0.83 ; 10 ; 24 ; 47 ; 1.15 ; 83 ; 2.02 ;-2,124 ;-462.75 `;
 
-export const PROVINCE_IMAGES: Record<string, string> = {
-  "Bocas del Toro": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web1.png",
-  "Coclé": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web2.png",
-  "Colón": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web3.png",
-  "Chiriquí": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web4.png",
-  "Darién": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web5.png",
-  "Herrera": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web6.png",
-  "Los Santos": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web7.png",
-  "Panamá": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web8.png",
-  "Veraguas": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web9.png",
-  "Comarca Kuna Yala": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web10.png",
-  "Comarca Ngabe Bugle": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web12.png",
-  "Panamá Oeste": "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web13.png"
+export interface ProvinceInfo {
+  number: number;
+  image: string;
+  color: string;
+}
+
+export const PROVINCE_METADATA: Record<string, ProvinceInfo> = {
+  "Bocas del Toro": {
+    number: 1,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-01.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Coclé": {
+    number: 2,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-02.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Colón": {
+    number: 3,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-03.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Chiriquí": {
+    number: 4,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-04.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Darién": {
+    number: 5,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-05.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Herrera": {
+    number: 6,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-06.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Los Santos": {
+    number: 7,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-07.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Panamá": {
+    number: 8,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-08.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Veraguas": {
+    number: 9,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-09.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Comarca Kuna Yala": {
+    number: 10,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-10.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Comarca Ngabe Bugle": {
+    number: 11,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web12-1.png",
+    color: "from-blue-900 to-blue-700"
+  },
+  "Panamá Oeste": {
+    number: 13,
+    image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-13.png",
+    color: "from-blue-900 to-blue-700"
+  }
 };

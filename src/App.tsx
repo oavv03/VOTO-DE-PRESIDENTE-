@@ -12,7 +12,7 @@ import {
 import { Bar, Pie } from 'react-chartjs-2';
 import { ChevronDown, ChevronUp, Users, ClipboardList, Vote, BarChart3, MapPin } from 'lucide-react';
 import { consolidateData, ElectionConsolidated, CircuitData } from './data/parser';
-import { PROVINCE_IMAGES } from './data/electionData';
+import { PROVINCE_METADATA } from './data/electionData';
 import { cn } from './lib/utils';
 
 ChartJS.register(
@@ -177,13 +177,18 @@ const ProvinceCard = ({ province, data, index }: ProvinceCardProps) => {
     return { ...t, part };
   }, [data]);
 
+  const meta = PROVINCE_METADATA[province] || { number: index + 1, image: "", color: "from-blue-900 to-blue-700" };
+
   return (
     <div className="mb-6 rounded-xl overflow-hidden shadow-lg border border-gray-200 bg-white">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-blue-900 to-blue-700 text-white transition-all hover:brightness-110"
+        className={cn(
+          "w-full flex items-center justify-between p-4 text-white transition-all hover:brightness-110 bg-gradient-to-r",
+          meta.color
+        )}
       >
-        <span className="text-lg font-bold">{index + 1}. {province}</span>
+        <span className="text-lg font-bold">{meta.number}. {province}</span>
         {isOpen ? <ChevronUp /> : <ChevronDown />}
       </button>
 
@@ -192,7 +197,7 @@ const ProvinceCard = ({ province, data, index }: ProvinceCardProps) => {
           <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
             <div className="w-full md:w-[320px] flex-shrink-0">
               <img
-                src={PROVINCE_IMAGES[province]}
+                src={meta.image}
                 alt={province}
                 className="w-full rounded-xl shadow-md border border-gray-100"
                 referrerPolicy="no-referrer"
