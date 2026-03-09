@@ -90,7 +90,7 @@ export function consolidateData(): ElectionConsolidated {
         "Roux/Blandon": cleanNum(f["Blandon"] || f["Roux"]),
         "Lombana": cleanNum(f["LOMBANA"]),
         "Martin": cleanNum(f["MARTIN"]),
-        "Meliton": cleanNum(f["MELITON"]),
+        "Meliton LP3": cleanNum(f["MELITON"]),
         "Zulay LP1": cleanNum(f["Zulay  LP1"]),
         "Maribel LP2": cleanNum(f["Maribel LP2"])
       };
@@ -101,7 +101,11 @@ export function consolidateData(): ElectionConsolidated {
         "ALIANZA": cleanNum(f["ALIANZA"]),
         "CD": cleanNum(f["CD"]),
         "PANAMEÑISTA": cleanNum(f["PANAMEÑISTA"] || f["PANAMEISTA"]),
-        "PAIS": cleanNum(f["PAIS"])
+        "PAIS": cleanNum(f["PAIS"]),
+        "PP": cleanNum(f["MARTIN"]),
+        "LP1": cleanNum(f["Zulay  LP1"]),
+        "LP2": cleanNum(f["Maribel LP2"]),
+        "LP3": cleanNum(f["LP3"])
       };
     }
   });

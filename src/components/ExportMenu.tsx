@@ -5,6 +5,7 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { cn } from '../lib/utils';
 import { Chart as ChartJS } from 'chart.js/auto';
+import { CANDIDATE_PHOTOS } from '../constants';
 
 interface ExportMenuProps {
   province: string;
@@ -30,6 +31,45 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     const ctx = canvas.getContext('2d');
     if (!ctx) return '';
 
+    // Custom plugin for images in exported chart
+    const exportImagePlugin = {
+      id: 'exportImagePlugin',
+      afterDraw: (chart: any) => {
+        const { ctx, scales: { y } } = chart;
+        if (!y) return;
+
+        chart.data.labels.forEach((label: string, index: number) => {
+          const url = CANDIDATE_PHOTOS[label];
+          if (url) {
+            const img = new Image();
+            img.src = url;
+            const yPos = y.getPixelForTick(index);
+            const xPos = 10;
+            const size = 50; // Larger size
+            const radius = size / 2;
+            
+            if (img.complete) {
+              ctx.save();
+              ctx.beginPath();
+              ctx.arc(xPos + radius, yPos, radius, 0, Math.PI * 2);
+              ctx.closePath();
+              ctx.clip();
+              ctx.drawImage(img, xPos, yPos - radius, size, size);
+              ctx.restore();
+              
+              ctx.save();
+              ctx.beginPath();
+              ctx.arc(xPos + radius, yPos, radius, 0, Math.PI * 2);
+              ctx.strokeStyle = '#cbd5e1';
+              ctx.lineWidth = 2;
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
+        });
+      }
+    };
+
     const chart = new ChartJS(ctx, {
       type: 'bar',
       data: {
@@ -42,20 +82,30 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
         }]
       },
       options: {
+        indexAxis: 'y',
         responsive: false,
         animation: { duration: 0 },
+        layout: {
+          padding: {
+            left: 10
+          }
+        },
+        scales: {
+          y: {
+            ticks: {
+              padding: 10
+            }
+          }
+        },
         plugins: {
           legend: { display: false },
           title: { display: true, text: title, font: { size: 16 } }
-        },
-        scales: {
-          y: { beginAtZero: true }
         }
       }
     });
 
-    // Wait for render
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Wait for images to load and chart to render
+    await new Promise(resolve => setTimeout(resolve, 500));
     const imgData = canvas.toDataURL('image/png');
     chart.destroy();
     return imgData;
@@ -272,14 +322,15 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
 
       const candidateRows = Object.entries(consolidatedCandidates)
         .sort((a, b) => b[1] - a[1])
-        .map(([cand, votes]) => [cand, votes.toLocaleString()]);
+        .map(([cand, votes]) => ['', cand, votes.toLocaleString()]);
 
       autoTable(doc, {
         startY: yPos,
         head: [['Candidato', 'Votos Totales']],
-        body: candidateRows,
+        body: candidateRows.map(row => [row[1], row[2]]),
         theme: 'striped',
-        headStyles: { fillColor: [0, 51, 102] }
+        headStyles: { fillColor: [0, 51, 102] },
+        styles: { valign: 'middle' },
       });
     }
 

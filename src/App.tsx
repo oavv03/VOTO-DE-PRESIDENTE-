@@ -14,6 +14,7 @@ import { ChevronDown, ChevronUp, Users, ClipboardList, Vote, BarChart3, MapPin }
 import { consolidateData, ElectionConsolidated, CircuitData } from './data/parser';
 import { PROVINCE_METADATA } from './data/electionData';
 import { cn } from './lib/utils';
+import { CANDIDATE_PHOTOS, PARTY_LOGOS } from './constants';
 import { ExportMenu } from './components/ExportMenu';
 
 ChartJS.register(
@@ -36,6 +37,46 @@ const CANDIDATE_COLORS = [
   '#003366', '#0055aa', '#4caf50', '#ffeb3b', '#f44336', '#9c27b0', '#ff9800', '#795548'
 ];
 
+const candidateImagesPlugin = {
+  id: 'candidateImages',
+  afterDraw: (chart: any) => {
+    const { ctx, scales: { y } } = chart;
+    if (!y) return;
+
+    chart.data.labels.forEach((label: string, index: number) => {
+      const url = CANDIDATE_PHOTOS[label];
+      if (url) {
+        const img = new Image();
+        img.src = url;
+        const yPos = y.getPixelForTick(index);
+        const xPos = 10; // Fixed position on the left
+        const size = 50; // Larger size
+        const radius = size / 2;
+        
+        if (img.complete) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(xPos + radius, yPos, radius, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(img, xPos, yPos - radius, size, size);
+          ctx.restore();
+          
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(xPos + radius, yPos, radius, 0, Math.PI * 2);
+          ctx.strokeStyle = '#cbd5e1';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+        } else {
+          img.onload = () => chart.draw();
+        }
+      }
+    });
+  }
+};
+
 const CircuitDetails = ({ circuit, data, province }: { circuit: string; data: CircuitData; province: string }) => {
   const participation = ((data.tec.emi / data.tec.pad) * 100).toFixed(2);
   const circuitSummary = {
@@ -46,8 +87,33 @@ const CircuitDetails = ({ circuit, data, province }: { circuit: string; data: Ci
     part: participation
   };
 
-  const candidateLabels = Object.keys(data.cand);
-  const candidateValues = Object.values(data.cand);
+  const sortedCandidates = useMemo(() => {
+    return Object.entries(data.cand)
+      .sort(([, a], [, b]) => b - a);
+  }, [data.cand]);
+
+  const candidateLabels = sortedCandidates.map(([l]) => l);
+  const candidateValues = sortedCandidates.map(([, v]) => v);
+
+  const sortedAlliances = useMemo(() => {
+    return [
+      { name: "PRD + MOLIRENA", parties: ["PRD", "MOLIRENA"] },
+      { name: "RM + ALIANZA", parties: ["RM", "ALIANZA"] },
+      { name: "CD + PANAMEÑISTA", parties: ["CD", "PANAMEÑISTA"] },
+      { name: "MELINTON LP + PAIS", parties: ["LP3", "PAIS"] }
+    ].map(alliance => ({
+      ...alliance,
+      votes: alliance.parties.reduce((acc, p) => acc + (data.party[p] || 0), 0)
+    })).sort((a, b) => b.votes - a.votes);
+  }, [data.party]);
+
+  const sortedParties = useMemo(() => {
+    return Object.entries(data.party)
+      .sort(([, a], [, b]) => b - a);
+  }, [data.party]);
+
+  const partyLabels = sortedParties.map(([l]) => l);
+  const partyValues = sortedParties.map(([, v]) => v);
 
   const candidateBarData = {
     labels: candidateLabels,
@@ -100,28 +166,60 @@ const CircuitDetails = ({ circuit, data, province }: { circuit: string; data: Ci
         <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 border-l-4 border-blue-600 pl-2 bg-gray-100 py-1">
           Votos por Candidato
         </h4>
-        <div className="overflow-x-auto mb-4">
-          <table className="w-full text-xs text-left border-collapse">
-            <thead>
-              <tr className="bg-white border-b border-gray-200">
-                {candidateLabels.map(l => <th key={l} className="p-2 border border-gray-200">{l}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {candidateValues.map((v, i) => <td key={i} className="p-2 border border-gray-200">{v.toLocaleString()}</td>)}
-              </tr>
-            </tbody>
-          </table>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
+          {sortedCandidates.map(([l, v]) => (
+            <div key={l} className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center">
+              <div className="relative mb-2">
+                {CANDIDATE_PHOTOS[l] ? (
+                  <img 
+                    src={CANDIDATE_PHOTOS[l]} 
+                    alt={l} 
+                    className="w-16 h-16 rounded-full object-cover border-2 border-blue-100 shadow-sm"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-200">
+                    <Users className="text-gray-400" size={24} />
+                  </div>
+                )}
+              </div>
+              <div className="text-[10px] font-bold text-gray-500 uppercase tracking-tight mb-1 line-clamp-1">
+                {l}
+              </div>
+              <div className="text-sm font-black text-blue-900">
+                {v.toLocaleString()}
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="bg-white p-4 rounded-lg border border-gray-200 h-[400px] mb-8">
+        <div className="bg-white p-4 rounded-lg border border-gray-200 h-[300px] mb-8">
           <Bar
             data={candidateBarData}
             options={{
               indexAxis: 'y' as const,
               responsive: true,
               maintainAspectRatio: false,
-              plugins: { legend: { display: false } }
+              layout: {
+                padding: {
+                  left: 10
+                }
+              },
+              scales: {
+                y: {
+                  ticks: {
+                    padding: 10
+                  }
+                }
+              },
+              plugins: { 
+                legend: { display: false },
+                tooltip: {
+                  enabled: true,
+                  callbacks: {
+                    label: (context) => `Votos: ${context.parsed.x.toLocaleString()}`
+                  }
+                }
+              }
             }}
           />
         </div>
@@ -129,36 +227,100 @@ const CircuitDetails = ({ circuit, data, province }: { circuit: string; data: Ci
 
       <div>
         <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 border-l-4 border-blue-600 pl-2 bg-gray-100 py-1">
+          Votos por Alianza
+        </h4>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+          {sortedAlliances.map((alliance) => {
+            return (
+              <div key={alliance.name} className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center">
+                <div className="flex gap-1 justify-center items-center mb-2">
+                  {alliance.parties.map((p, idx) => (
+                    <img 
+                      key={idx}
+                      src={PARTY_LOGOS[p]} 
+                      alt={p} 
+                      className="w-10 h-8 object-contain border border-gray-100 shadow-sm"
+                      referrerPolicy="no-referrer"
+                    />
+                  ))}
+                </div>
+                <div className="text-[10px] font-bold text-gray-500 uppercase tracking-tight mb-1 line-clamp-1">
+                  {alliance.name}
+                </div>
+                <div className="text-sm font-black text-blue-900">
+                  {alliance.votes.toLocaleString()}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 border-l-4 border-blue-600 pl-2 bg-gray-100 py-1">
           Votos por Partido
         </h4>
-        <div className="overflow-x-auto mb-4">
-          <table className="w-full text-xs text-left border-collapse">
-            <thead>
-              <tr className="bg-white border-b border-gray-200">
-                {Object.keys(data.party).map(l => <th key={l} className="p-2 border border-gray-200">{l}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {Object.values(data.party).map((v, i) => <td key={i} className="p-2 border border-gray-200">{v.toLocaleString()}</td>)}
-              </tr>
-            </tbody>
-          </table>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-11 gap-3 mb-6">
+          {sortedParties.map(([l, v]) => (
+            <div key={l} className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center text-center">
+              <div className="relative mb-2">
+                {PARTY_LOGOS[l] ? (
+                  <img 
+                    src={PARTY_LOGOS[l]} 
+                    alt={l} 
+                    className="w-16 h-10 object-contain border border-gray-100 shadow-sm"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-16 h-10 bg-gray-100 flex items-center justify-center border border-gray-200">
+                    <Vote className="text-gray-400" size={20} />
+                  </div>
+                )}
+              </div>
+              <div className="text-[10px] font-bold text-gray-500 uppercase tracking-tight mb-1 line-clamp-1">
+                {l}
+              </div>
+              <div className="text-sm font-black text-blue-900">
+                {v.toLocaleString()}
+              </div>
+            </div>
+          ))}
         </div>
         <div className="bg-white p-4 rounded-lg border border-gray-200 h-[300px]">
           <Bar
             data={{
-              labels: Object.keys(data.party),
+              labels: partyLabels,
               datasets: [{
                 label: 'Votos',
-                data: Object.values(data.party),
-                backgroundColor: '#475569',
+                data: partyValues,
+                backgroundColor: '#0055aa',
               }]
             }}
             options={{
+              indexAxis: 'y' as const,
               responsive: true,
               maintainAspectRatio: false,
-              plugins: { legend: { display: false } }
+              layout: {
+                padding: {
+                  left: 10
+                }
+              },
+              scales: {
+                y: {
+                  ticks: {
+                    padding: 10
+                  }
+                }
+              },
+              plugins: { 
+                legend: { display: false },
+                tooltip: {
+                  enabled: true,
+                  callbacks: {
+                    label: (context) => `Votos: ${context.parsed.x.toLocaleString()}`
+                  }
+                }
+              }
             }}
           />
         </div>
