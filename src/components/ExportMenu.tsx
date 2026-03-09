@@ -5,7 +5,7 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { cn } from '../lib/utils';
 import { Chart as ChartJS } from 'chart.js/auto';
-import { CANDIDATE_PHOTOS } from '../constants';
+import { CANDIDATE_PHOTOS, PARTY_LOGOS } from '../constants';
 
 interface ExportMenuProps {
   province: string;
@@ -21,6 +21,8 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     includeSummary: true,
     includeCircuits: !circuit,
     includeCandidates: true,
+    includeAlliances: true,
+    includeParties: true,
     includeCharts: true,
   });
 
@@ -151,18 +153,85 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     if (config.includeCandidates) {
       const candidatesData: any[] = [['VOTOS POR CANDIDATO'], [''], ['Circuito', 'Candidato', 'Votos']];
       if (circuit) {
-        Object.entries(data.cand).forEach(([cand, votes]: [string, any]) => {
-          candidatesData.push([circuit, cand, votes]);
-        });
+        Object.entries(data.cand)
+          .sort(([, a], [, b]) => (b as number) - (a as number))
+          .forEach(([cand, votes]: [string, any]) => {
+            candidatesData.push([circuit, cand, votes]);
+          });
       } else {
-        Object.entries(data).forEach(([circ, c]: [string, any]) => {
+        const consolidated: Record<string, number> = {};
+        Object.values(data).forEach((c: any) => {
           Object.entries(c.cand).forEach(([cand, votes]: [string, any]) => {
-            candidatesData.push([circ, cand, votes]);
+            consolidated[cand] = (consolidated[cand] || 0) + votes;
           });
         });
+        Object.entries(consolidated)
+          .sort(([, a], [, b]) => b - a)
+          .forEach(([cand, votes]) => {
+            candidatesData.push(['PROVINCIAL', cand, votes]);
+          });
       }
       const wsCandidates = XLSX.utils.aoa_to_sheet(candidatesData);
       XLSX.utils.book_append_sheet(wb, wsCandidates, 'Candidatos');
+    }
+
+    if (config.includeAlliances) {
+      const alliancesData: any[] = [['VOTOS POR ALIANZA'], [''], ['Circuito', 'Alianza', 'Votos']];
+      const alliances = [
+        { name: "PRD + MOLIRENA", parties: ["PRD", "MOLIRENA"] },
+        { name: "RM + ALIANZA", parties: ["RM", "ALIANZA"] },
+        { name: "CD + PANAMEÑISTA", parties: ["CD", "PANAMEÑISTA"] },
+        { name: "MELINTON LP + PAIS", parties: ["LP3", "PAIS"] }
+      ];
+
+      if (circuit) {
+        alliances.map(a => ({
+          name: a.name,
+          votes: a.parties.reduce((acc, p) => acc + (data.party[p] || 0), 0)
+        }))
+        .sort((a, b) => b.votes - a.votes)
+        .forEach(a => alliancesData.push([circuit, a.name, a.votes]));
+      } else {
+        const consolidatedParties: Record<string, number> = {};
+        Object.values(data).forEach((c: any) => {
+          Object.entries(c.party).forEach(([p, v]: [string, any]) => {
+            consolidatedParties[p] = (consolidatedParties[p] || 0) + v;
+          });
+        });
+        alliances.map(a => ({
+          name: a.name,
+          votes: a.parties.reduce((acc, p) => acc + (consolidatedParties[p] || 0), 0)
+        }))
+        .sort((a, b) => b.votes - a.votes)
+        .forEach(a => alliancesData.push(['PROVINCIAL', a.name, a.votes]));
+      }
+      const wsAlliances = XLSX.utils.aoa_to_sheet(alliancesData);
+      XLSX.utils.book_append_sheet(wb, wsAlliances, 'Alianzas');
+    }
+
+    if (config.includeParties) {
+      const partiesData: any[] = [['VOTOS POR PARTIDO'], [''], ['Circuito', 'Partido', 'Votos']];
+      if (circuit) {
+        Object.entries(data.party)
+          .sort(([, a], [, b]) => (b as number) - (a as number))
+          .forEach(([p, v]: [string, any]) => {
+            partiesData.push([circuit, p, v]);
+          });
+      } else {
+        const consolidated: Record<string, number> = {};
+        Object.values(data).forEach((c: any) => {
+          Object.entries(c.party).forEach(([p, v]: [string, any]) => {
+            consolidated[p] = (consolidated[p] || 0) + v;
+          });
+        });
+        Object.entries(consolidated)
+          .sort(([, a], [, b]) => b - a)
+          .forEach(([p, v]) => {
+            partiesData.push(['PROVINCIAL', p, v]);
+          });
+      }
+      const wsParties = XLSX.utils.aoa_to_sheet(partiesData);
+      XLSX.utils.book_append_sheet(wb, wsParties, 'Partidos');
     }
 
     const fileName = circuit 
@@ -200,15 +269,27 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     const doc = new jsPDF();
     let yPos = 20;
 
+    // Pre-fetch all images to base64 to avoid CORS/loading issues in PDF
+    const imageCache: Record<string, string> = {};
+    const allImageUrls = [
+      ...Object.values(CANDIDATE_PHOTOS),
+      ...Object.values(PARTY_LOGOS),
+      'https://images.weserv.nl/?url=plagel2024.com/wp-content/uploads/2023/02/logo-plagel-2022.webp&w=300&h=300&fit=cover&mask=circle&output=png'
+    ] as string[];
+
+    await Promise.all(allImageUrls.map(async (url: string) => {
+      if (url && !imageCache[url]) {
+        imageCache[url] = await getLogoBase64(url);
+      }
+    }));
+
     // Header
     doc.setFillColor(0, 51, 102);
     doc.rect(0, 0, 210, 40, 'F');
     
-    // Add Logo using a proxy to avoid CORS issues
     const logoUrl = 'https://images.weserv.nl/?url=plagel2024.com/wp-content/uploads/2023/02/logo-plagel-2022.webp&w=300&h=300&fit=cover&mask=circle&output=png';
-    const logoBase64 = await getLogoBase64(logoUrl);
+    const logoBase64 = imageCache[logoUrl];
     if (logoBase64) {
-      // Position logo on the left
       doc.addImage(logoBase64, 'PNG', 10, 5, 30, 30);
     }
 
@@ -251,7 +332,6 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
       doc.text('2. Análisis Gráfico', 14, yPos);
       yPos += 10;
 
-      // Consolidate candidates for the chart
       const consolidatedCandidates: Record<string, number> = {};
       if (circuit) {
         Object.entries(data.cand).forEach(([cand, votes]: [string, any]) => {
@@ -322,15 +402,153 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
 
       const candidateRows = Object.entries(consolidatedCandidates)
         .sort((a, b) => b[1] - a[1])
-        .map(([cand, votes]) => ['', cand, votes.toLocaleString()]);
+        .map(([cand, votes]) => [
+          cand, 
+          votes.toLocaleString(), 
+          { content: '', raw: CANDIDATE_PHOTOS[cand] || '' }
+        ]);
 
       autoTable(doc, {
         startY: yPos,
-        head: [['Candidato', 'Votos Totales']],
-        body: candidateRows.map(row => [row[1], row[2]]),
+        head: [['Candidato', 'Votos Totales', 'Foto']],
+        body: candidateRows,
         theme: 'striped',
         headStyles: { fillColor: [0, 51, 102] },
-        styles: { valign: 'middle' },
+        styles: { valign: 'middle', minCellHeight: 20 },
+        columnStyles: {
+          2: { cellWidth: 20 }
+        },
+        didDrawCell: (data) => {
+          if (data.section === 'body' && data.column.index === 2) {
+            const cellRaw = data.cell.raw as any;
+            const imgUrl = typeof cellRaw === 'object' ? cellRaw.raw : cellRaw;
+            const base64 = imageCache[imgUrl];
+            if (base64) {
+              doc.addImage(base64, 'PNG', data.cell.x + 2, data.cell.y + 2, 16, 16);
+            }
+          }
+        }
+      });
+      yPos = (doc as any).lastAutoTable.finalY + 20;
+    }
+
+    if (config.includeAlliances) {
+      if (yPos > 220) { doc.addPage(); yPos = 20; }
+      doc.setFontSize(16);
+      doc.text(circuit ? '4. Resultados por Alianza' : '5. Resultados por Alianza', 14, yPos);
+      yPos += 10;
+
+      const alliances = [
+        { name: "PRD + MOLIRENA", parties: ["PRD", "MOLIRENA"] },
+        { name: "RM + ALIANZA", parties: ["RM", "ALIANZA"] },
+        { name: "CD + PANAMEÑISTA", parties: ["CD", "PANAMEÑISTA"] },
+        { name: "MELINTON LP + PAIS", parties: ["LP3", "PAIS"] }
+      ];
+
+      let allianceResults: { name: string, votes: number, logos: string[] }[] = [];
+      if (circuit) {
+        allianceResults = alliances.map(a => ({
+          name: a.name,
+          votes: a.parties.reduce((acc, p) => acc + (data.party[p] || 0), 0),
+          logos: a.parties.map(p => PARTY_LOGOS[p] || '')
+        }));
+      } else {
+        const consolidatedParties: Record<string, number> = {};
+        Object.values(data).forEach((c: any) => {
+          Object.entries(c.party).forEach(([p, v]: [string, any]) => {
+            consolidatedParties[p] = (consolidatedParties[p] || 0) + v;
+          });
+        });
+        allianceResults = alliances.map(a => ({
+          name: a.name,
+          votes: a.parties.reduce((acc, p) => acc + (consolidatedParties[p] || 0), 0),
+          logos: a.parties.map(p => PARTY_LOGOS[p] || '')
+        }));
+      }
+
+      const allianceRows = allianceResults
+        .sort((a, b) => b.votes - a.votes)
+        .map(a => [
+          a.name, 
+          a.votes.toLocaleString(), 
+          { content: '', raw: a.logos }
+        ]);
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Alianza', 'Votos Totales', 'Logos']],
+        body: allianceRows,
+        theme: 'striped',
+        headStyles: { fillColor: [0, 102, 51] },
+        styles: { valign: 'middle', minCellHeight: 15 },
+        columnStyles: {
+          2: { cellWidth: 30 }
+        },
+        didDrawCell: (data) => {
+          if (data.section === 'body' && data.column.index === 2) {
+            const cellRaw = data.cell.raw as any;
+            const logos = typeof cellRaw === 'object' ? cellRaw.raw : cellRaw;
+            if (Array.isArray(logos)) {
+              logos.forEach((logo, idx) => {
+                const base64 = imageCache[logo];
+                if (base64) {
+                  doc.addImage(base64, 'PNG', data.cell.x + 2 + (idx * 12), data.cell.y + 2, 10, 8);
+                }
+              });
+            }
+          }
+        }
+      });
+      yPos = (doc as any).lastAutoTable.finalY + 20;
+    }
+
+    if (config.includeParties) {
+      if (yPos > 220) { doc.addPage(); yPos = 20; }
+      doc.setFontSize(16);
+      doc.text(circuit ? '5. Resultados por Partido' : '6. Resultados por Partido', 14, yPos);
+      yPos += 10;
+
+      const consolidatedParties: Record<string, number> = {};
+      if (circuit) {
+        Object.entries(data.party).forEach(([p, v]: [string, any]) => {
+          consolidatedParties[p] = v;
+        });
+      } else {
+        Object.values(data).forEach((c: any) => {
+          Object.entries(c.party).forEach(([p, v]: [string, any]) => {
+            consolidatedParties[p] = (consolidatedParties[p] || 0) + v;
+          });
+        });
+      }
+
+      const partyRows = Object.entries(consolidatedParties)
+        .sort((a, b) => b[1] - a[1])
+        .map(([p, v]) => [
+          p, 
+          v.toLocaleString(), 
+          { content: '', raw: PARTY_LOGOS[p] || '' }
+        ]);
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [['Partido', 'Votos Totales', 'Logo']],
+        body: partyRows,
+        theme: 'striped',
+        headStyles: { fillColor: [102, 51, 0] },
+        styles: { valign: 'middle', minCellHeight: 15 },
+        columnStyles: {
+          2: { cellWidth: 20 }
+        },
+        didDrawCell: (data) => {
+          if (data.section === 'body' && data.column.index === 2) {
+            const cellRaw = data.cell.raw as any;
+            const imgUrl = typeof cellRaw === 'object' ? cellRaw.raw : cellRaw;
+            const base64 = imageCache[imgUrl];
+            if (base64) {
+              doc.addImage(base64, 'PNG', data.cell.x + 2, data.cell.y + 2, 16, 10);
+            }
+          }
+        }
       });
     }
 
@@ -415,6 +633,26 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
               <span className="text-gray-700">Votos por Candidato</span>
               <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", config.includeCandidates ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300")}>
                 {config.includeCandidates && <Check size={14} />}
+              </div>
+            </button>
+
+            <button
+              onClick={() => setConfig(prev => ({ ...prev, includeAlliances: !prev.includeAlliances }))}
+              className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+            >
+              <span className="text-gray-700">Votos por Alianza</span>
+              <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", config.includeAlliances ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300")}>
+                {config.includeAlliances && <Check size={14} />}
+              </div>
+            </button>
+
+            <button
+              onClick={() => setConfig(prev => ({ ...prev, includeParties: !prev.includeParties }))}
+              className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+            >
+              <span className="text-gray-700">Votos por Partido</span>
+              <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", config.includeParties ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300")}>
+                {config.includeParties && <Check size={14} />}
               </div>
             </button>
           </div>
