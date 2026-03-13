@@ -1,5 +1,5 @@
 {
-  "name": "Resultados Electorales Panamá 2024",
-  "description": "Visualización detallada de los resultados de las elecciones presidenciales por provincia y circuito.",
+  "name": "Resultados Electorales Panamá",
+  "description": "Visualización de los resultados electorales de Panamá 2024 por provincia y distrito.",
   "requestFramePermissions": []
 }

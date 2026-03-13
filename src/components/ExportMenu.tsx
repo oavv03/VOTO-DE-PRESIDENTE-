@@ -12,9 +12,10 @@ interface ExportMenuProps {
   summary: any;
   data: any;
   circuit?: string;
+  label?: string;
 }
 
-export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data, circuit }) => {
+export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data, circuit, label = "Circuito" }) => {
   const [showOptions, setShowOptions] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [config, setConfig] = useState({
@@ -119,9 +120,9 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     
     if (config.includeSummary) {
       const summaryData = [
-        [circuit ? `INFORME ELECTORAL 2024 - CIRCUITO ${circuit}` : 'INFORME ELECTORAL 2024'],
+        [circuit ? `INFORME ELECTORAL 2024 - ${label.toUpperCase()} ${circuit}` : 'INFORME ELECTORAL 2024'],
         ['Provincia', province],
-        circuit ? ['Circuito', circuit] : [''],
+        circuit ? [label, circuit] : [''],
         [''],
         ['Categoría', 'Valor'],
         ['Centros', summary.cen],
@@ -135,7 +136,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     }
 
     if (config.includeCircuits && !circuit) {
-      const circuitsData: any[] = [['DETALLE POR CIRCUITOS'], [''], ['Circuito', 'Centros', 'Mesas', 'Padrón', 'Válidos', 'Participación']];
+      const circuitsData: any[] = [[`DETALLE POR ${label.toUpperCase()}S`], [''], [label, 'Centros', 'Mesas', 'Padrón', 'Válidos', 'Participación']];
       Object.entries(data).forEach(([circ, c]: [string, any]) => {
         circuitsData.push([
           circ,
@@ -147,11 +148,11 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
         ]);
       });
       const wsCircuits = XLSX.utils.aoa_to_sheet(circuitsData);
-      XLSX.utils.book_append_sheet(wb, wsCircuits, 'Circuitos');
+      XLSX.utils.book_append_sheet(wb, wsCircuits, `${label}s`);
     }
 
     if (config.includeCandidates) {
-      const candidatesData: any[] = [['VOTOS POR CANDIDATO'], [''], ['Circuito', 'Candidato', 'Votos']];
+      const candidatesData: any[] = [['VOTOS POR CANDIDATO'], [''], [label, 'Candidato', 'Votos']];
       if (circuit) {
         Object.entries(data.cand)
           .sort(([, a], [, b]) => (b as number) - (a as number))
@@ -176,7 +177,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     }
 
     if (config.includeAlliances) {
-      const alliancesData: any[] = [['VOTOS POR ALIANZA'], [''], ['Circuito', 'Alianza', 'Votos']];
+      const alliancesData: any[] = [['VOTOS POR ALIANZA'], [''], [label, 'Alianza', 'Votos']];
       const alliances = [
         { name: "PRD + MOLIRENA", parties: ["PRD", "MOLIRENA"] },
         { name: "RM + ALIANZA", parties: ["RM", "ALIANZA"] },
@@ -210,7 +211,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     }
 
     if (config.includeParties) {
-      const partiesData: any[] = [['VOTOS POR PARTIDO'], [''], ['Circuito', 'Partido', 'Votos']];
+      const partiesData: any[] = [['VOTOS POR PARTIDO'], [''], [label, 'Partido', 'Votos']];
       if (circuit) {
         Object.entries(data.party)
           .sort(([, a], [, b]) => (b as number) - (a as number))
@@ -235,7 +236,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     }
 
     const fileName = circuit 
-      ? `Informe_Electoral_${province.replace(/\s/g, '_')}_Circuito_${circuit.replace(/\s/g, '_')}.xlsx`
+      ? `Informe_Electoral_${province.replace(/\s/g, '_')}_${label}_${circuit.replace(/\s/g, '_')}.xlsx`
       : `Informe_Electoral_${province.replace(/\s/g, '_')}.xlsx`;
     
     XLSX.writeFile(wb, fileName);
@@ -299,7 +300,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     doc.setFontSize(14);
     doc.text(`Provincia: ${province}`, 115, 26, { align: 'center' });
     if (circuit) {
-      doc.text(`Circuito: ${circuit}`, 115, 34, { align: 'center' });
+      doc.text(`${label}: ${circuit}`, 115, 34, { align: 'center' });
     }
     
     yPos = 50;
@@ -307,7 +308,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
 
     if (config.includeSummary) {
       doc.setFontSize(16);
-      doc.text(circuit ? `1. Resumen Circuito ${circuit}` : '1. Resumen Provincial', 14, yPos);
+      doc.text(circuit ? `1. Resumen ${label} ${circuit}` : '1. Resumen Provincial', 14, yPos);
       yPos += 10;
       
       autoTable(doc, {
@@ -349,7 +350,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
       const labels = sortedCands.map(c => c[0]);
       const values = sortedCands.map(c => c[1]);
 
-      const chartImg = await generateChartImage(labels, values, circuit ? `Votos Circuito ${circuit}` : 'Votos Consolidados por Candidato');
+      const chartImg = await generateChartImage(labels, values, circuit ? `Votos ${label} ${circuit}` : 'Votos Consolidados por Candidato');
       if (chartImg) {
         doc.addImage(chartImg, 'PNG', 15, yPos, 180, 90);
         yPos += 100;
@@ -359,7 +360,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     if (config.includeCircuits && !circuit) {
       if (yPos > 220) { doc.addPage(); yPos = 20; }
       doc.setFontSize(16);
-      doc.text('3. Detalle por Circuitos', 14, yPos);
+      doc.text(`3. Detalle por ${label}s`, 14, yPos);
       yPos += 10;
 
       const circuitRows = Object.entries(data).map(([circ, c]: [string, any]) => [
@@ -373,7 +374,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
 
       autoTable(doc, {
         startY: yPos,
-        head: [['Circuito', 'Centros', 'Mesas', 'Padrón', 'Válidos', 'Part.']],
+        head: [[label, 'Centros', 'Mesas', 'Padrón', 'Válidos', 'Part.']],
         body: circuitRows,
         theme: 'grid',
         headStyles: { fillColor: [0, 51, 102] }
@@ -562,7 +563,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     }
 
     const fileName = circuit 
-      ? `Informe_Electoral_${province.replace(/\s/g, '_')}_Circuito_${circuit.replace(/\s/g, '_')}.pdf`
+      ? `Informe_Electoral_${province.replace(/\s/g, '_')}_${label}_${circuit.replace(/\s/g, '_')}.pdf`
       : `Informe_Electoral_${province.replace(/\s/g, '_')}.pdf`;
     
     doc.save(fileName);
@@ -596,7 +597,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
               onClick={() => setConfig(prev => ({ ...prev, includeSummary: !prev.includeSummary }))}
               className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-gray-50 transition-colors text-sm"
             >
-              <span className="text-gray-700">{circuit ? 'Resumen de Circuito' : 'Resumen Provincial'}</span>
+              <span className="text-gray-700">{circuit ? `Resumen de ${label}` : 'Resumen Provincial'}</span>
               <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", config.includeSummary ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300")}>
                 {config.includeSummary && <Check size={14} />}
               </div>
@@ -619,7 +620,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
                 onClick={() => setConfig(prev => ({ ...prev, includeCircuits: !prev.includeCircuits }))}
                 className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-gray-50 transition-colors text-sm"
               >
-                <span className="text-gray-700">Detalle de Circuitos</span>
+                <span className="text-gray-700">Detalle de {label}s</span>
                 <div className={cn("w-5 h-5 rounded border flex items-center justify-center transition-colors", config.includeCircuits ? "bg-blue-600 border-blue-600 text-white" : "border-gray-300")}>
                   {config.includeCircuits && <Check size={14} />}
                 </div>
