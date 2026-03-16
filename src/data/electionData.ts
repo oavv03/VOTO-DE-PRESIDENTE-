@@ -1,3 +1,744 @@
+export const DIPUTADO_CSV = `Circuito Electoral y Candidato	Total de Votos Obtenidos	PRD	P. Popular	MOLIRENA	P. Panameñista	CD	P. Alianza	Realizando Metas	PAIS	Movimiento Otro Camino	Libre Postulación (1)	Libre Postulación (2)	Libre Postulación (3)
+													
+Bocas del Toro													
+													
+   Circuito 1.1													
+Benicio Robinson "El Gato"	16860 	16860 											
+Abel Beker Abrego ®	15508 	15508 											
+"Tro Ñougobu" Abel Taylor	3180 		3180 										
+Sarah Yohai Kaduri	2913 		2913 										
+Abel Beker Abrego 	881 			881 									
+Abraham Palacio	929 			929 									
+Marco Jiménez "Choy Nütobo"	15186 				15186 								
+Ubaldo Vallejos	15328 				15328 								
+Yesica Romero	16927 					16927 							
+Eusebio Vega Vega	14561 					14561 							
+Leonardo "El Indio" Ellington	1278 						1278 						
+Eddie Ibarra "Edy" ®	1225 						1225 						
+Eddie Ibarra "Edy"	7715 							7715 					
+Marcos Van Horn	7531 							7531 					
+Eusebio "Chevo" Smith	98 								98 				
+Ibrahin Binns "Kora Ñgobo"	3271 									3271 			
+Cesar Prescott	2956 									2956 			
+Senen Alfonso Briceño "Brice"	841 										841 		
+Marianela Rivera	1330 											1330 	
+Doctor Tugri Gerardo Miranda	6947 												6947 
+													
+Coclé													
+													
+   Circuito 2.1													
+Daniel Ramos Tuñon	9099 	9099 											
+Nestor "Tin" Guardia	9722 	9722 											
+"Villillin" Tejeira	1773 		1773 										
+Luis F. "Ñato" Lombardo	1833 		1833 										
+Ricardo Diaz	567 			567 									
+Nestor "Tin" Guardia ®	664 			664 									
+John Nicola	4230 				4230 								
+Eyber D. Castañeda Guardia	4273 				4273 								
+Julio De La Guardia	12390 					12390 							
+Dr. Néstor Chen Fernández	9835 					9835 							
+Victor Cedeño	512 						512 						
+"Rosarito" Berrocal ®	521 						521 						
+"Rosarito" Berrocal 	6811 							6811 					
+Ricardo J. González G.	6500 							6500 					
+Melquisidec Bernal D.	773 								773 				
+David Ortiz	588 								588 				
+Dr. Víctor Carles	9600 									9600 			
+Doris Solanilla Fernandez	9037 									9037 			
+Hugo Huguin Garcia	771 										771 		
+Ricardo Jaen	1411 											1411 	
+Raul Camargo Garcia	1598 												1598 
+Reyes Aguilar	1331 												1331 
+													
+   Circuito 2.2	34751 												
+Melchor Herrera	6032 	5389 		643 									
+Ricardo Solis Ponce	5371 		941 		4430 								
+Orlando "El Capi" Carrasquilla	11818 					11818 							
+Lourdes "Lulu" Castillo	4936 						618 	4318 					
+Sandy Luz Correa Flores	3550 									2755 		795 	
+Daniel Arauz Morales	1935 										1935 		
+Manuel "Fulo" Alvarez	1109 												1109 
+													
+   Circuito 2.3	35921 												
+Dana Castañeda	15147 	2981 		1729 			2392 	8045 					
+Juan Manuel Peralta Peralta	6354 		4692 								1662 		
+Luis Ernesto Carles	5850 				4526 	1324 							
+Manuel Manolo Chanis	1336 								1336 				
+Jorge Ivan Chiari Gonzalez	3724 									3724 			
+Jeremias Victoria	3510 											3510 	
+													
+   Circuito 2.4	30198 												
+"Monchin" Cedeño	1158 	1158 											
+Dr. Francisco "Paco" Navarro	1237 		1237 										
+John Jairo "Jj" De León	6104 			6104 									
+Jorge Herrera	9396 				9396 								
+Noriel Castillo	4848 					4848 							
+Omar "Matito" Cornejo	4943 						893 	4050 					
+Belisario Lopez	1832 									1832 			
+Yannia Vanessa Visuetti G	680 										680 		
+													
+Colón													
+													
+   Circuito 3.1													
+Jairo "Bolota" Salazar	13396 	13396 											
+Yoel Rodriguez Jordan	12762 	12762 											
+Roberto "Tito Político" Gómez	11690 	11690 											
+Alexis Higuera ®	7303 	7303 											
+Ronaldo Chen	2041 		2041 										
+Harold Cummings "Con Cristo"	1943 		1943 										
+Damaso "Chito" Garcia Trucco	2131 		2131 										
+Pablo Aguilar	1709 		1709 										
+Alexis Higuera 	2213 			2213 									
+Jose "Colin" Triana	2004 			2004 									
+Pedro Torres	9008 				9008 								
+Dulce María Ulloa	5548 				5548 								
+Karen Amaya	5435 				5435 								
+Roshan Parvani	6012 				6012 								
+Ivan Tejada	6629 					6629 							
+Federico Policani	5161 					5161 							
+Jembell Chifundo	5018 					5018 							
+Pedro Torres ®	3834 					3834 							
+Luis Antonio Chaverra Martinez	835 						835 						
+Luzmila Herazo	893 						893 						
+Rafael Riquelme	749 						749 						
+Gilberto Flores "Piccolino" ®	814 						814 						
+Víctor de Jesus hijo de Delfia	21460 							21460 					
+Rogelio "Revan" Revello	16875 							16875 					
+Gilberto Flores "Piccolino" 	15551 							15551 					
+Miguel Salas	15558 							15558 					
+Luis "El Negrito" Castro	9822 								9822 				
+" El Profe" Enrique Brooks	5887 								5887 				
+Dominico "Nikito" Medina S.	7715 									7715 			
+Juan Cabeza Meneses "Juanchi"	6690 									6690 			
+Ariel Hughes 	2188 										2188 		
+Yamireliz Chong	13599 											13599 	
+Ulises Green	11462 											11462 	
+Cecilio Orlando Daley Burke	11318 											11318 	
+Aimé Sterling "Mayitita"	929 												929 
+													
+   Circuito 3.2	25863 												
+Nelson Jackson Palma	9945 	5006 		2039 				2900 					
+Benjamin	2559 		1384 								1175 		
+Yinela Abrego	9356 				4545 	4811 							
+Mario Figueroa	1154 						1154 						
+Doctor Solis	2849 								1579 			1270 	
+													
+Chiriquí													
+													
+   Circuito 4.1													
+Fernando Arce	9098 	9098 											
+Francisco Vigil	8740 	8740 											
+Miguel Fanovich ®	6242 	6242 											
+Belkis Quiroz Suira	2469 		2469 										
+Francisco Troya Aguirre	2502 		2502 										
+Ricaurte Dr. Ríos	1998 		1998 										
+Miguel Fanovich 	4091 			4091 									
+José Santamaría Samudio	2293 			2293 									
+Tomás "Tomy" Armuelles	2172 			2172 									
+Hugo Méndez	6769 				6769 								
+Johana Ríos	4976 				4976 								
+Carmen Guerra De Trujillo	4553 				4553 								
+Rene "Mompirry" Caballero	3871 					3871 							
+"Niko" Rivera	3146 					3146 							
+José Félix González Caceres	2870 					2870 							
+Eliecer Jiménez	863 						863 						
+Bonilla Luis Alberto	875 						875 						
+Willy Joel Rueda	803 						803 						
+Jamis Acosta	11588 							11588 					
+Aixa Santamaría	11506 							11506 					
+Murillo	8682 							8682 					
+Manuel Serracín "Tu Abogado"	402 								402 				
+"Pastora" Maricel De Rondon	436 								436 				
+Dr. Ricardo Moreno "Chocho"	373 								373 				
+Iris "Lizzie" Morales	6477 									6477 			
+"La Profe" Yarelis I Garcia M	6799 									6799 			
+Ninfa Beatriz Araúz González	6102 									6102 			
+Augusto Tuto Palacios	20169 										20169 		
+Carlos Calitín Saldaña	18782 										18782 		
+Nedcie Yanguez Rios	18266 										18266 		
+Abdel Torres	9242 											9242 	
+Ariel Juncá	5783 											5783 	
+Jorhan Castillo	6047 											6047 	
+Profe Edward Cedeño	1513 												1513 
+Jhoel De Enlace De Esperanza	1202 												1202 
+Davis Fernandez	1101 												1101 
+													
+   Circuito 4.2	32993 												
+"Sammy" Bardayan Jr.	5948 	5948 											
+Dra. Yesica Valdés	4765 		4765 										
+Christopher Rodríguez El Chiri	1749 			1749 									
+Everardo "Pipo" Concepción	3690 				3142 	548 							
+Osman Camilo Gómez	8328 						8328 						
+Diego Javier Morales	3330 							3330 					
+Manuel De Jesús Serracín	1074 								1074 				
+Dra. Cristel Atencio	2730 									2730 			
+Aldemaro Atencio	1167 										1167 		
+Moisés Joy Araúz	212 											212 	
+													
+   Circuito 4.3													
+Dr. Juan Esquivel Santamaría	4144 	4144 											
+Ricardo "Rikarena" Gómez	6327 	6327 											
+Keisy Gantes	2243 		2243 										
+Senen De La Torre	1905 		1905 										
+Dr. Pablo Vargas	1153 			1153 									
+Ricardo "Rikarena" Gómez ® 	1324 			1324 									
+Ariana Coba	9712 				9712 								
+Ricardo Vigil López	13169 				13169 								
+Rony Araúz	9510 					9510 							
+Prof. Felicito Bellido	8315 					8315 							
+Mitzi Miranda	680 						680 						
+Andrés "Andy" Álvarez	638 						638 						
+Leida Moreno	5432 							5432 					
+Gilberto Pino	5172 							5172 					
+Richard Nuñez	339 								339 				
+Norma Elizabeth Atencio Arauz	632 										632 		
+Dagoberto Gutierrez M.	5536 											5536 	
+													
+   Circuito 4.4  	34482 												
+Gonzalo G. González M.	4277 	4277 											
+José Manuel Lozada	4586 		4586 										
+Gonzalo G. Gonzalez M.	394 			394 									
+Medin Jiménez Pittí	11772 				7675 	4097 							
+Felipe Batista G. "Mi Abogado"	637 						637 						
+Javier Fernando Nando Saldaña	5750 							5750 					
+Jaime Lezcano Mojica	199 								199 				
+Jorge Lezcano	2172 									2172 			
+Doctor Bladimir Viquez	2447 										2447 		
+Karol Ortega Muñoz	2248 											2248 	
+													
+   Circuito 4.5	37341 												
+Manolo E. Ruiz C.	6095 	3261 		2834 									
+Dr. Rivera	3082 		3082 										
+"Teacher" Keiny	4454 				4454 								
+Alfonso Mou	5310 					5310 							
+Roberto Cervantes	4355 						533 	3822 					
+Sammy Samudio	1366 								1366 				
+Erick Julio Rovira	3630 										3630 		
+Jaime Caballero	1436 											1436 	
+Jhonathan Vega	7613 												7613 
+													
+   Circuito 4.6	22914 												
+"Freddy" Bonilla	5124 	4580 		544 									
+Eliecer Castrellón	8916 		8916 										
+Ana Giselle Rosas	4549 				1650 	2899 							
+Miriam Mabel S. De Cozzarelli	657 						657 						
+Luis González "Coco"	2413 							2413 					
+Prof. Marcelo A.	1011 									1011 			
+Rene Diaz Arjona	244 										244 		
+													
+Darién													
+													
+   Circuito 5.1	20131 												
+Eduardo Paz	4706 	4706 											
+Pastor Vargas "Pastor"	2943 		2943 										
+Isaac Mosquera	6162 			6162 									
+Miguel Antonio Valero	2508 				760 	1748 							
+Salvador "Yuni" De Leon	1135 						1135 						
+Dr. Diaz	1529 							1529 					
+Fredy Hidalgo	925 									925 			
+Israel Sánchez 	223 										223 		
+													
+   Circuito 5.2	15763 												
+Jaime Vargas	5927 	5074 		853 									
+Ezequiel Ramirez	2542 		2542 										
+Jesús A. Espinosa B.	161 				161 								
+Sixto Sanjur	1912 					1912 							
+Jorge "El Doctor" Vargas	4242 						418 	3824 					
+Clayton Lino	258 								258 				
+Israel Domínguez Marín	566 									566 			
+Omar Joseph 	155 										155 		
+													
+Herrera													
+													
+   Circuito 6.1	36080 												
+Jaime "Bamby" González	4141 	4141 											
+Luis Moreno "Chino" Moreno	642 		642 										
+Sebastián "Nuno" Peralta	150 			150 									
+Manuel Cohen Salerno	12190 				3154 	9036 							
+Penélope Nanín	9023 						1012 	8011 					
+"Joselito" Villalaz Gallardo	7475 									7475 			
+Errol Caballero	985 										985 		
+Modesto "Alexis" Quintero	95 											95 	
+Francisco Villalobos Vega	1379 												1379 
+													
+   Circuito 6.2	25583 												
+Julio Mendoza	3333 	3165 		168 									
+"Rolo" Crespo	677 		677 										
+"Popi" Varela	15187 				13047 	2140 							
+Melany Lisbeth Varela Gómez	5985 						978 	5007 					
+"Candín" Trejo	231 										231 		
+Eddy Isabel Abprofa Aguirre M.	170 											170 	
+													
+   Circuito 6.3	25805 												
+Marcos Castillero B.	8594 	8342 		252 									
+Juan Torres	7717 				6349 	1368 							
+Ingeniero Darío Marín Ocaña	8191 						560 	7631 					
+Daniel Gómez	245 								245 				
+José Antonio Aguilar López	1058 									1058 			
+													
+Los Santos													
+													
+   Circuito 7.1	36052 												
+Eric Broce	3112 	3112 											
+Dr Jaime Combe Solis	2387 		2387 										
+Tito Afú	16128 				3497 	12631 							
+Severino "Bellaco" Vega	5154 						5154 						
+Beatriz "Betty" Cano	4634 							4634 					
+Jorge Penna	1002 								218 		784 		
+Prof. Euribiades Huertas	3635 									3635 			
+													
+   Circuito 7.2	35256 												
+Olivares De Frías	5832 	5631 		201 									
+Dayra Moreno	5455 		5455 										
+Mariela Vega	8705 				3211 	5494 							
+Ronald De Gracia	9871 						999 	8872 					
+Alexis Rivera Vergara	1850 									1850 			
+Jorge Ramos	3543 										3543 		
+													
+Panamá													
+													
+   Circuito 8.1	33823 												
+Carlos Batista	5357 	4773 		584 									
+Lucho Díaz	853 		853 										
+César Cruz Vega	4100 				4100 								
+Cristhian Brandao Cordero	5457 					1793 						3664 	
+Joan "Jony" Guevara	11772 						11772 						
+Ana Irene Delgado	4747 							4456 	291 				
+Hernan Vasquez "El Patriarca"	519 									519 			
+Pascacio La Voz Del Pueblo	814 										814 		
+Medina	204 												204 
+													
+    Circuito 8.2													
+Raul Pineda	15730 	15730 											
+Leandro Avila	9071 	9071 											
+Luis Oliva	12045 	12045 											
+José Ruiloba "El Motor"	13566 	13566 											
+Kathy Ramos	7483 	7483 											
+Calixto Silgado "Obama"	6647 	6647 											
+Francisco "Pancho" Aleman ®	6441 	6441 											
+"Profa Jacky" Hurtado Payne	2862 		2862 										
+Félix Moulanier	3255 		3255 										
+Machuca Jose	2483 		2483 										
+Jorge Simons Jr.	2636 		2636 										
+Nitzeira Watson	2544 		2544 										
+Francisco "Pancho" Aleman	3416 			3416 									
+Ariette Paredes	2142 			2142 									
+El Vecino	1776 			1776 									
+Carlos "Dj Cuca" Rivera	1814 			1814 									
+Orlando E. Aguilar "Bomberito"	1724 			1724 									
+Cleyder Guevara	1912 			1912 									
+Christian Toto Castillo	1374 			1374 									
+Itzi Atencio	2710 				2710 								
+Roberto ¨Rob¨ Nieto	2136 				2136 								
+Enrique Pele Marin	1700 				1700 								
+Nadgee Bonilla	1987 				1987 								
+Mario Prado "El Licen"	1592 				1592 								
+Pablo Castilla "El Prof"	1537 				1537 								
+Jorge George Alvarado	1591 				1591 								
+Eric Portocarrero	3397 					3397 							
+Abraham Martinez	2843 					2843 							
+Victor Córdoba	2383 					2383 							
+Carlos Melgar	2225 					2225 							
+Cesar "Puxu" Caicedo	6033 					6033 							
+Victor Diaz 	2083 					2083 							
+Itzi Atencio ®	2146 					2146 							
+Profesora Dalila Mosquera	877 						877 						
+Fernando "Birria" Samaniego	687 						687 						
+Luis "Dicky" Romero	688 						688 						
+Ricauter Sinisterra Castillo	646 						646 						
+Raul Patiño	674 						674 						
+Jovanita De Roa	696 						696 						
+Juan Antonio Tejada Pinillo	725 						725 						
+Camacho Castro "El Amigo Fiel"	19267 							19267 					
+Dalia Bernal	15890 							15890 					
+Gerald Cumberbatch	15200 							15200 					
+Justiniani Miguel	16126 							16126 					
+Marcos González El Comandante	15496 							15496 					
+Omar Ortega	17705 							17705 					
+Profesora Dalila Mosquera ®	14681 							14681 					
+Rudelda "Rudy" Guzman	1301 								1301 				
+Silka Sanchez De Gonzalez	1608 								1608 				
+Javier Montenegro	934 								934 				
+Sergio E ."Quique" Bairnals I	1013 								1013 				
+Vicente Torres Ramos	906 								906 				
+Toto	851 								851 				
+Manuel Landero Herrera	915 								915 				
+Dempsil Del Rosario Arroyo	4889 									4889 			
+Yahaira Peren De Toureau	4936 									4936 			
+Ricardo Antonio Cortes Bonilla	6090 									6090 			
+Roy Jiménez	4692 									4692 			
+Alcibiades Al Mendez Cabrera	4667 									4667 			
+Zulay Rodriguez Lu	11161 										11161 		
+Arnulfo "UFO"Gonzalez 	6533 										6533 		
+Jose Luis Blandon 	6114 										6114 		
+Liney Mena 	6448 										6448 		
+Ricardo Vasquez Ambientalista	6090 										6090 		
+Jose Caballero 	5986 										5986 		
+Angel Ortega Gonzalez	64280 											64280 	
+Eduardo Gaitan 	68169 											68169 	
+Alexandra "Ale" Brenes 	65103 											65103 	
+Luis "Lucho" Duke	66324 											66324 	
+Felipe "Pipe" Chong	63912 											63912 	
+Francisco Garces 	63166 											63166 	
+Doctora Yarelis Rodriguez 	64498 											64498 	
+Jean Marcel Chery Periodista	3174 												3174 
+Jayro Garcia 	2841 												2841 
+Sugey Tatiana Rueda 	2724 												2724 
+													
+   Circuito 8.3													
+Hector Brands	14064 	14064 											
+Dr. Crispiano Adames Navarro	15114 	15114 											
+Emelie García Miró	7490 	7490 											
+Rey Montero	7104 	7104 											
+Corina Cano ®	6898 	6898 											
+Ramón Ashby Barrera Ramoncito	3411 		3411 										
+Dr. Torick Arce	3008 		3008 										
+Ileana Tejera Lee	2522 		2522 										
+Dra. Ingrid Perscky Arravanti	2790 		2790 										
+Corina Cano 	654 			654 									
+Shayna Valladares	325 			325 									
+Gysel García	348 			348 									
+Camilo Salcedo	321 			321 									
+"Yamy" Blandón	2955 				2955 								
+Benito Lucero 	1757 				1757 								
+Roberto Santamaría "Chiricano"	1715 				1715 								
+Julio Pon	1827 				1827 								
+Carlos González	3240 				3240 								
+Jair Martínez	2520 					2520 							
+Manuel Núñez	1384 					1384 							
+Vonetta Giselle	1371 					1371 							
+Patrick Fahy Espinosa	1383 					1383 							
+"Yamy" Blandón ®	1410 					1410 							
+"La Profe"	279 						279 						
+Keira Navarro ®	251 						251 						
+Sergio "Chello" Gálvez	14502 							14502 					
+Keira Navarro 	9655 							9655 					
+"Profesor" Eduardo Pinnock	9959 							9959 					
+Edmundo Cubilla "El Olímpico"	9435 							9435 					
+"Teo" Abrego	9462 							9462 					
+José Alberto "Toto" Alvarez	506 								506 				
+Rubén Eduardo Rodríguez	358 								358 				
+Rogelio Moreno Hassán	380 								380 				
+"El Chino" Fujimori	363 								363 				
+Linda Loo	11890 									11890 			
+José Pérez Barboni	12355 									12355 			
+Elías López	11329 									11329 			
+Alexander Coparropa	11105 									11105 			
+Otto Gamboa	11116 									11116 			
+Walkiria Chandler D'Orcy	30435 										30435 		
+Paulette Thomas Horly	29648 										29648 		
+Ruben De La Rosa Educación100%	28736 										28736 		
+Ana Matilde Gomez	8526 											8526 	
+Jose Luis Fussa Romero	1237 												1237 
+													
+    Circuito 8.4													
+Javier "Paco" Sucre	10441 	10441 											
+"Doctor" Víctor Castillo	9393 	9393 											
+Charlie Sousa-Lennox	9095 	9095 											
+"Guapo" López	6271 	6271 											
+Josi Fares ®	6316 	6316 											
+Omar Elías Castillo López	3160 		3160 										
+Dr. Herick Bernal	2603 		2603 										
+Alex "Negro Fino" Charles	2362 		2362 										
+Ariel "El Chino" Lim Yueng	2495 		2495 										
+Josi Fares 	2305 			2305 									
+Carmen Nadine Barrios J.	1285 			1285 									
+"Albertito" Guerra	2760 				2760 								
+"Fulo" Linares	2629 				2629 								
+Stephanie Cardoze	1841 				1841 								
+Lucas	1953 				1953 								
+Chris Herrera	1619 				1619 								
+Sebastián Abadía	2212 					2212 							
+"Bebito C".	1593 					1593 							
+Ramiro López"El Nutricionista"	1683 					1683 							
+Miguel Gallardo Ferrer	1840 					1840 							
+"Albertito" Guerra ®	1339 					1339 							
+Otoniel García	406 						406 						
+Helmut De Puy ®	296 						296 						
+Alejandro Pérez	8282 							8282 					
+Helmut De Puy	7808 							7808 					
+Dra. Nitzia Torres	7961 							7961 					
+Gilberto Romero	7337 							7337 					
+César Zapata Múñoz	7532 							7532 					
+Raúl Ricardo Rodríguez Tripler	407 								407 				
+Elizabeth "Eli" Acosta	469 								469 				
+Ricardo "Ricky" Alvarado	470 								470 				
+Iván Montalvo	362 								362 				
+Lital Smith	350 								350 				
+Grace Hernández	12697 									12697 			
+Mark Harrick Atie	11921 									11921 			
+Doctor Ernesto Cedeño	14577 									14577 			
+Gabriel Menasche	11684 									11684 			
+Javier Eduardo Baldeolivar	11541 									11541 			
+Yaidelis Gonzalez	3815 										3815 		
+Roberto Zuñiga	40766 											40766 	
+Jorge Bloise Iglesias	40205 											40205 	
+Juan Carlos Rojas Barrios	38653 											38653 	
+Eulogio Castillo Marin	38176 											38176 	
+Cristal Balabarca Cedeño	39640 											39640 	
+Raul Fernandez	4230 												4230 
+Delmys Holmes De Richa	3127 												3127 
+Daniel Lombana 	3194 												3194 
+													
+    Circuito 8.5													
+Yamilka Chirú	11343 	11343 											
+Alina Gonzalez	5555 	5555 											
+Tito Rodriguez Mena ®	5432 	5432 											
+Yassir Purcait	4738 		4738 										
+Manuel Guillen	3209 		3209 										
+Ernesto Vega Sin Diosnadasomos	3244 		3244 										
+Tito Rodriguez Mena 	4391 			4391 									
+Germán "Es El Man"	3467 			3467 									
+Alexis Jimenez Oliva	2746 			2746 									
+Luis Barria	7233 				7233 								
+Luis Lucho Aldeano	5022 				5022 								
+Genesis Arjona	5122 					5122 							
+Porfirio Bolita Ellis	6840 					6840 							
+Ruben Medina	5305 					5305 							
+Abraham "Reyin" Reyes Polo	817 						817 						
+Alexander Jimenez Soto	834 						834 						
+Ariel Vallarino ®	865 						865 						
+Idalia Valdes	12972 							12972 					
+Antonio "Toño" Alexópulos	12163 							12163 					
+Ariel Vallarino	12875 							12875 					
+Julio Grimas	1398 								1398 				
+Rafael Delgado	957 								957 				
+Vanessa "Heidy" Bantán	959 								959 				
+Alfonso "Foncho" Murillo	4116 									4116 			
+Leo Gonzalez	4512 									4512 			
+Luis Alberto El Que Sí Camina!	4044 									4044 			
+Yessickam - Susan- Carrera	1572 										1572 		
+Jose Luis Delgado	2841 											2841 	
+Visitacion Ramos	2574 											2574 	
+Neftali Zamora	34613 												34613 
+Melissa Jaramillo	31079 												31079 
+Jorge Gonzalez	33559 												33559 
+													
+    Circuito 8.6													
+"La Profe" Cenobia	10261 	10261 											
+Raphael Buchanan	14513 	14513 											
+Nicolás "Nico" Vargas	9391 	9391 											
+Cecibel García ®	6926 	6926 											
+Rafael Pino-Pinto	4369 		4369 										
+Jaime Chung Ye	4440 		4440 										
+Luis Sánchez	4159 		4159 										
+Cecibel García	3327 			3327 									
+Profesora Kenia Aparicio	3608 			3608 									
+Vielka Cortes Ovalle	2453 			2453 									
+Samuel "Zamy" Zambrano Rivera	2316 			2316 									
+Elías Vigil "Amigo Del Pueblo"	7262 				7262 								
+Omar Velásquez	5118 				5118 								
+Zenaida Pitti	3873 				3873 								
+Lemos	4056 				4056 								
+Edwin Zuñiga	5430 					5430 							
+Santo Cholo Vega	3915 					3915 							
+John Almillategui "John John"	3386 					3386 							
+Yeilin Zulay Pinto Jaen	3743 					3743 							
+José Muñoz Molina	26170 							26170 					
+Alaín Cedeño	27434 							27434 					
+Yalineth Pitty	23302 							23302 					
+Guillermo Lay López	20739 							20739 					
+Jose Iván Cadogan Melgarejo	2232 								2232 				
+Iván Richards Arrocha	1425 								1425 				
+Rogelio Quinn	1340 								1340 				
+Omar El Profe Morales	1307 								1307 				
+Rosemary Barrios Olmos	11714 									11714 			
+Francisco "Fast" Stanley	9772 									9772 			
+Anabela Perez Garcia	9875 									9875 			
+Juan Pico	9448 									9448 			
+Pedro Rojas	1351 										1351 		
+Cesar Vargas Vasquez	1613 										1613 		
+Rolando Padilla	1304 										1304 		
+Manuel Bebo Samaniego	22430 											22430 	
+Manuel Moyito Acevedo Fajardo	22224 											22224 	
+Gilberto Wilson Nuñez	21985 											21985 	
+Cesar Eloy Saldaña	21606 											21606 	
+Yarelys Gómez	19329 												19329 
+Betserai Richards	33692 												33692 
+													
+Veraguas													
+													
+   Circuito 9.1													
+Luis Rafael Cruz	9137 	9137 											
+Lenin Villar	10350 	10350 											
+Dr. Ivan Lopez	2070 		2070 										
+Ulises "Chino" Pimentel	2624 		2624 										
+William Petrocelli	203 			203 									
+Luis Rafael Cruz ®	201 			201 									
+Iván González	3066 				3066 								
+Eduardo Pinzón	4789 				4789 								
+Samid Sandoval	4063 					4063 							
+Abdiel Batista Gonzalez	3687 					3687 							
+"Doctor" Johny Castillo	712 						712 						
+Fatima Agrazal ®	759 						759 						
+Fatima Agrazal	9122 							9122 					
+Carlos Avila	7365 							7365 					
+Jose Luis Carrera A.	282 								282 				
+Rigoberto "Rigo" Rodriguez	5438 									5438 			
+Fatima Hernandez	5355 									5355 			
+Yadira Pino	1964 										1964 		
+Humberto Torres Moreno	1067 											1067 	
+Janine Prado	15466 												15466 
+Miguel Angel Campos	12956 												12956 
+													
+   Circuito 9.2	42000 												
+Ariel Alba	5565 	5565 											
+Edda Montemayor Guerra	1594 		1594 										
+Luigi Abrego	5642 			5642 									
+Albis Addiel Camarena	11629 				4401 	7228 							
+Tomas "Tomy" Benavides	11992 						1083 	10909 					
+Omar Sanchez Sanchez Omarcito	69 								69 				
+Dr. Erick Oriel Camaño	2146 									2146 			
+Emilio Castillo	3363 										3363 		
+													
+   Circuito 9.3	38421 												
+Eugenio "Geñito" Bernal	8506 	7785 		721 									
+Jose "Negro" Valencia Abrego	7438 		7438 										
+Jose De La Cruz Aguilar 	770 						770 						
+Francisco "Panchito" Brea	16042 				11516 	4526 							
+Marcelo A. Pérez García	5665 							5665 					
+													
+   Circuito 9.4	23357 												
+Ricardo Torres	5243 	4960 		283 									
+Candido Jordan Anria	604 		604 										
+Didiano "Didi" Pinilla Rios	8985 				2111 	6874 							
+Ezequiel "Checa" Pinzón	2415 						2415 						
+Celestino "Tinito" Gonzalez	3591 							3591 					
+Marcial *El Teacher* Rios	207 								207 				
+Yamileth Atencio	1225 									1225 			
+Salomón Moreno	1087 										1087 		
+													
+Comarca Kuna Yala													
+													
+   Circuito 10.1	9027 												
+Flor Brenes	2799 	2799 											
+Fidelio "Olo" Alfaro	1814 				1814 								
+Toño Martinez	1508 					1508 							
+Joseph "Lucio" Davies	390 						390 						
+Luciani Herrera	2386 							2386 					
+Enik Fernandez	130 								82 		48 		
+													
+   Circuito 10.2	9526 												
+Dr. A. Arias	2550 	2467 		83 									
+Rodelick Fulo Richards	2369 		2369 										
+Iguaibiliquina Hedman	2404 				614 	1790 							
+Absalón Herrera	36 						36 						
+Abdiel Ávila	2167 							2167 					
+													
+Comarca Ngäbe Buglé													
+													
+   Circuito 12.1	35521 												
+Sebastián Jiménez	12229 	12229 											
+Oiden Sam "Chochi"	881 		881 										
+Roberto Archibold "Chobra"	13307 				9538 	3769 							
+Lauriana Jimenez	2780 						2780 						
+Leopoldo "Pop" Archibold	5195 							5195 					
+Eugenio Juarez	262 								262 				
+Lorenzo "Nudobo" Jimenez	867 									867 			
+													
+   Circuito 12.2	37350 												
+Nixon Andrade	12548 	12548 											
+Francisco Javier Palacio	1943 		1943 										
+Nicanor "Toba" Pinzón	1230 			1230 									
+Felicia Bejerano Mechi Krüäbo	8483 				8483 								
+Diego "Hicha" Rodríguez	9197 					9197 							
+Rogelio Moreno	187 						187 						
+Edilberto Montezuma Cueva	819 							819 					
+Jeremías Atencio	437 								437 				
+Luz Gallardo Sánchez	310 									310 			
+Adan Bejerano Rios	743 										743 		
+Patricio Sire Gonzalez	1453 											1453 	
+													
+   Circuito 12.3	33821 												
+Ricardo "Chody" Santo	6197 	6197 											
+Dr. Vicente	2889 		2889 										
+Elvia Jimenez Ortega	2424 			2424 									
+Gertrudis "Tule" Rodriguez	11429 				2395 	9034 							
+Gustavo Pinzon	3343 						3343 						
+Ramón Mendoza	4111 							4111 					
+Demecio Case	390 								390 				
+Eduardo Chiré Pinto	1057 									1057 			
+Evangelisto Acosta	1540 										1540 		
+Eladia "Ela" Carpintero	441 											441 	
+													
+Panamá Oeste													
+													
+   Circuito 13.1													
+Nando Meneses	16599 	16599 											
+Kayra Harding	10482 	10482 											
+Jorge Chang Chanis	8377 	8377 											
+Tolentino Soto Rios	3468 		3468 										
+Maximina De Fernandez	3416 		3416 										
+Chino Nickray	4954 		4954 										
+Jannette Castillo	1247 			1247 									
+"Doctor" Vladimir Olive	1144 			1144 									
+Rolando Ayala Independiente	1223 			1223 									
+Vicente Puga	8055 					8055 							
+Licda Belkis Saavedra	8194 					8194 							
+Jose Ibarra	6968 					6968 							
+Doctor Julio Nieto Ramos	2693 						2693 						
+Miledys Perez Mily Perez	1943 						1943 						
+Shirley Castañedas "La Licen"	20048 							20048 					
+Mily Palma	19520 							19520 					
+Marylín Vallarino	16818 							16818 					
+Samuel Bailey	1118 								1118 				
+Dalys Aguilar Garcia	1046 								1046 				
+Yilena Sandoval	954 								954 				
+Hermel Rodriguez Cuan	11858 									11858 			
+Enrique Garcia Valdes	10686 									10686 			
+Fernando Xavier Gonzalez	10607 									10607 			
+Lenin Alberto Ulate R.	23474 										23474 		
+Manuel Cheng Peñalba	21783 										21783 		
+Prof Abdiel Quique Gonzalez T	3895 											3895 	
+Suky Yard	19256 												19256 
+José Roberto Martínez 	12835 												12835 
+													
+   Circuito 13.2	29036 												
+Jorge Ramos	10713 	1601 		298 			305 	8509 					
+Jafeph Betesh Arosemena	2422 		1922 									500 	
+Eduardo "Fana" Vasquez	13163 				2637 	10526 							
+Irene Gil Herrera "Gil"	1521 									1521 			
+Giovanna Graziadei	1217 										1217 		
+													
+   Circuito 13.3	33287 												
+"Junior" Herrera	10840 	2523 		350 			619 	7348 					
+Joaquin Fernando Franco Iii	2477 		1314 						1163 				
+Edwin Vergara	12372 				5600 	6772 							
+Joaquin Frias	6233 										6233 		
+Omaira Singh Castillo "Omi"	834 											834 	
+Ricardo Quintero	531 												531 
+													
+   Circuito 13.4													
+Roberto Ayala	9123 	9123 											
+Roberto Ábrego "Fuerza Ábrego"	8670 	8670 											
+Eliecer Montenegro	10767 	10767 											
+Patsy Lee Renteria	11872 		11872 										
+Cesar Herrera Robles Cesarín	10763 		10763 										
+Armando Aparicio Jaen	8717 		8717 										
+Anibal Vasquez	1299 			1299 									
+Yenni La Fula	1122 			1122 									
+Luis Aguilar	1217 			1217 									
+Arturo Velarde	9517 				9517 								
+Aquiles ¨Quilito¨ Acevedo	7486 				7486 								
+Humberto ¨Pami¨Benitez	5931 				5931 								
+Aris Y Ya	1028 						1028 						
+Jose L. Tuñon	847 						847 						
+Francisco Ameglio	17364 							17364 					
+Yuzaida Marin	20293 							20293 					
+Lilia Batista	19128 							19128 					
+Simon Batista	2084 								2084 				
+Jose Bocanegra	1502 								2084 				
+Lic. Luciano Gaitan Saavedra	1289 								1289 				
+Jose "Betito" Arcia Soriano	9750 									9750 			
+Ricardo Montenegro El Chiri	9465 									9465 			
+Kerubis Isabel Harris Gonzalez	4667 										4667 		
+Javier Nuñez	10782 											10782 	
+Anubis Osorio	10383 											10383 	
+Brayan Salas	9531 											9531 	
+Profesor Luis Lasso	10032 												10032 
+Ana M. Dutary	9503 												9503 
+`
+
 export const ALCALDE_DETALLE_CSV = `Provincia,Distrito,Candidato,Total_Votos,PRD,P_Popular,MOLIRENA,P_Panamenista,CD,P_Alianza,Realizando_Metas,PAIS,Movimiento_Otro_Camino,Libre_Postulacion_1,Libre_Postulacion_2,Libre_Postulacion_3
 Bocas del Toro,Bocas del Toro,Wilbur Waya Martinez Dixon,2962,2962,0,0,0,0,0,0,0,0,0,0,0
 Bocas del Toro,Bocas del Toro,Gustavo Navarro Tavo,595,0,595,0,0,0,0,0,0,0,0,0,0
@@ -591,7 +1332,7 @@ export const PROVINCE_METADATA: Record<string, ProvinceInfo> = {
     image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web-10.png",
     color: "from-blue-900 to-blue-700"
   },
-  "Comarca Ngabe Bugle": {
+  "Comarca Ngäbe Buglé": {
     number: 11,
     image: "https://plagel2024.com/wp-content/uploads/2026/03/Provincias-ind-web12-1.png",
     color: "from-blue-900 to-blue-700"
@@ -621,3 +1362,17 @@ Veraguas;649;649;100;178,315;167,518;93.9;40,626;13,947;8,991;22,371;22,021;7,80
 Comarca Emberá;41;41;100;7,341;6,891;93.9;2,036;1,123;1,201;550;578;150;897;270;86;0;0;0;258;3.5;192;2.6
 Comarca Ngabe Bugle;512;512;100;118,037;105,879;89.7;33,691;10,096;5,161;17,379;14,382;5,089;10,081;1,146;1,403;3,622;2,458;1,371;8,473;7.2;3,685;3.1
 Panama Oeste;947;974;102.9;330,237;318,347;96.4;50,523;28,736;6,645;34,589;42,122;6,671;62,105;5,138;21,386;37,528;10,350;12,554;6,756;2;5,134;0`;
+
+export const DIPUTADO_RESUMEN_CSV = `Provincia, Comarca y Circuito Electoral;Total de Mesas; Mesas Escrutadas;DIPU_mesasescrutadas (%);Total de votos Emitidos;Total de Votos Válidos;DIPU_Validos (%);PRD;P. Popular;MOLIRENA;P. Panameñista;CD;P. Alianza;RM;PAIS;MOCA;Libre Postulación (1);Libre Postulación (2);Libre Postulación (3);Votos en Blanco;DIPU_Blanco (%);Votos Nulos;DIPU_Nulos (%)
+Bocas del Toro;300;300;100;81307;77413;95,21074446;17287;3292;1001;16357;17253;1343;8218;98;3445;842;1330;6947;1822;2,240889468;2072;2,548366069
+Coclé;591;591;100;168550;158715;94,16493622;22918;8925;9215;24146;30886;4493;24037;2185;18393;5048;5716;2753;6076;3,604865025;3759;2,230198754
+Colón;485;484;99,79381443;148524;138086;92,97217958;25401;4415;4821;15914;15404;2367;28794;11833;8914;3363;15931;929;4794;3,22776117;5644;3,80005925
+Chiriquí;931;931;100;284516;270071;94,92295688;38552;27037;11328;40881;28186;12178;36784;3621;13754;29077;19352;9321;7414;2,605828846;7031;2,471214273
+Darién;166;166;100;39076;35894;91,85689426;9780;5485;7015;921;3660;1553;5353;258;1491;378;0;0;2117;5,417647661;1065;2,725458082
+Herrera;309;309;100;90663;87468;96,47596042;15648;1319;570;22550;12544;2550;20649;245;8533;1216;95;1549;1753;1,933534077;1442;1,590505498
+Los Santos;250;250;100;74733;71308;95,41701792;8743;7842;201;6708;18125;6153;13506;218;5485;4327;0;0;2231;2,985294314;1194;1,597687768
+Panamá;2198;2181;99,22656961;731767;697546;95,32351145;101138;24643;19141;34329;34564;15013;112545;8634;53635;52625;157898;83381;13377;1,828040893;20844;2,848447662
+Veraguas;649;648;99,8459168;178333;165911;93,0343795;31577;12578;6895;23024;23096;5146;30333;558;9322;6414;1067;15901;7518;4,215708814;4904;2,749911682
+Kuna Yala;90;90;100;19758;18553;93,90120458;5266;2369;83;2428;3298;426;4553;82;0;48;0;0;270;1,366535074;935;4,73226035
+Ngäbe Bublé;512;512;100;118034;106762;90,45020926;31044;5713;3654;20416;22000;6310;10125;1089;2234;2283;1894;0;7456;6,316823966;3816;3,232966772
+Panamá Oeste;974;971;99,69199179;329111;311901;94,77076123;40338;24886;3984;20018;30513;4781;72481;5429;24256;36104;17650;31461;8576;2,605807767;8634;2,623431`;

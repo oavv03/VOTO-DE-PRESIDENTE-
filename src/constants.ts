@@ -27,6 +27,20 @@ export const PARTY_LOGOS: Record<string, string> = {
   'LP3': 'https://images.weserv.nl/?url=plagel2024.com/wp-content/uploads/2026/03/12-mar-2026-09_56_43.png&w=100',
 };
 
+export const MAYOR_PROVINCE_IMAGES: Record<string, string> = {
+  "Bocas del Toro": "https://plagel2024.com/wp-content/uploads/2026/03/Bocas-del-Toro.png",
+  "Coclé": "https://plagel2024.com/wp-content/uploads/2026/03/Cocle.png",
+  "Colón": "https://plagel2024.com/wp-content/uploads/2026/03/Colon.png",
+  "Chiriquí": "https://plagel2024.com/wp-content/uploads/2026/03/Chiriqui.png",
+  "Darién": "https://plagel2024.com/wp-content/uploads/2026/03/Darien.png",
+  "Herrera": "https://plagel2024.com/wp-content/uploads/2026/03/Herrera.png",
+  "Los Santos": "https://plagel2024.com/wp-content/uploads/2026/03/Los-Santos.png",
+  "Panamá": "https://plagel2024.com/wp-content/uploads/2026/03/Panama.png",
+  "Veraguas": "https://plagel2024.com/wp-content/uploads/2026/03/Veraguas-1.png",
+  "Comarca Ngäbe Buglé": "https://plagel2024.com/wp-content/uploads/2026/03/ngabe-bugle.png",
+  "Panamá Oeste": "https://plagel2024.com/wp-content/uploads/2026/03/Panama-Oeste.png"
+};
+
 export const CANDIDATE_TO_PARTIES: Record<string, string[]> = {
   'Mulino': ['RM', 'ALIANZA'],
   'Roux/Blandon': ['CD', 'PANAMEÑISTA'],
@@ -37,3 +51,14 @@ export const CANDIDATE_TO_PARTIES: Record<string, string[]> = {
   'Maribel LP2': ['LP2'],
   'Meliton LP3': ['LP3', 'PAIS'],
 };
+
+export const ELECTION_ALLIANCES = [
+  { name: "RM + ALIANZA", parties: ["RM", "ALIANZA", "P_Alianza", "P. Alianza", "Realizando_Metas"] },
+  { name: "CD + PANAMEÑISTA", parties: ["CD", "PANAMEÑISTA", "P_Panamenista", "P. Panameñista"] },
+  { name: "PRD + MOLIRENA", parties: ["PRD", "MOLIRENA"] },
+  { name: "MOCA", parties: ["MOCA", "Movimiento_Otro_Camino"] },
+  { name: "PP", parties: ["PP", "P_Popular", "P. Popular"] },
+  { name: "ZULAY LP1", parties: ["LP1", "Libre_Postulacion_1"] },
+  { name: "MARIBEL LP2", parties: ["LP2", "Libre_Postulacion_2"] },
+  { name: "MELINTON LP + PAIS", parties: ["LP3", "PAIS", "Libre_Postulacion_3"] }
+];

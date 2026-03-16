@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import { DEF6_CSV, SEGUNDA_CSV, ALCALDE_DETALLE_CSV, ALCALDE_RESUMEN_CSV } from './electionData';
+import { DEF6_CSV, SEGUNDA_CSV, ALCALDE_DETALLE_CSV, ALCALDE_RESUMEN_CSV, DIPUTADO_CSV, DIPUTADO_RESUMEN_CSV } from './electionData';
 
 export interface TechData {
   cen: number;
@@ -24,6 +24,7 @@ export interface CircuitData {
   tec: TechData;
   cand: CandidateVotes;
   party: PartyVotes;
+  type?: 'UNI' | 'PLURI';
 }
 
 export interface MayorData {
@@ -36,14 +37,34 @@ export interface DistrictMayorData {
   [candidate: string]: MayorData;
 }
 
+export interface DiputadoData {
+  candidate: string;
+  total: number;
+  parties: PartyVotes;
+}
+
+export interface CircuitDiputadoData {
+  [candidate: string]: DiputadoData;
+}
+
 export interface ProvinceData {
   circuits: { [circuit: string]: CircuitData };
   mayors: { [district: string]: DistrictMayorData };
+  diputados: { [circuit: string]: CircuitDiputadoData };
   mayorSummary?: {
     mesas: number;
     validos: number;
     emitidos: number;
+    blancos: number;
+    nulos: number;
     count: number;
+  };
+  diputadoSummary?: {
+    mesas: number;
+    validos: number;
+    emitidos: number;
+    blancos: number;
+    nulos: number;
   };
 }
 
@@ -66,10 +87,11 @@ function normalizeProvince(p: string): string {
     "Darien": "Darién",
     "Panama": "Panamá",
     "Panama Oeste": "Panamá Oeste",
-    "Ngabe Bugle": "Comarca Ngabe Bugle",
+    "Ngabe Bugle": "Comarca Ngäbe Buglé",
     "Embera Wounaan": "Comarca Embera Wounaan",
     "Kuna Yala": "Comarca Kuna Yala",
-    "Comarca Emberá": "Comarca Embera Wounaan"
+    "Comarca Emberá": "Comarca Embera Wounaan",
+    "Comarca Ngabe Bugle": "Comarca Ngäbe Buglé"
   };
   return mapping[normalized] || normalized;
 }
@@ -85,19 +107,21 @@ export function consolidateData(): ElectionConsolidated {
   const segunda = Papa.parse(SEGUNDA_CSV, { ...parseConfig, transformHeader: (h) => h.trim() }).data as any[];
   const alcaldes = Papa.parse(ALCALDE_DETALLE_CSV, { header: true, skipEmptyLines: true, delimiter: "," }).data as any[];
   const alcaldesResumen = Papa.parse(ALCALDE_RESUMEN_CSV, { header: true, skipEmptyLines: true, delimiter: ";" }).data as any[];
+  const diputadosResumen = Papa.parse(DIPUTADO_RESUMEN_CSV, { header: true, skipEmptyLines: true, delimiter: ";" }).data as any[];
 
   const res: ElectionConsolidated = {};
 
   const cleanCircuit = (c: any) => {
     if (!c) return "";
-    return c.toString().replace(/Circuito/g, "").trim();
+    const cleaned = c.toString().replace(/Circuito/g, "").trim();
+    return cleaned.split(/[\s\t]+/)[0];
   };
 
   def6.forEach(f => {
     const p = normalizeProvince(f["Provincia"]);
     const c = cleanCircuit(f["Circuito"]);
     if (!p || !c) return;
-    if (!res[p]) res[p] = { circuits: {}, mayors: {} };
+    if (!res[p]) res[p] = { circuits: {}, mayors: {}, diputados: {} };
     if (!res[p].circuits[c]) {
       res[p].circuits[c] = {
         tec: { cen: 0, mes: 0, esc: 0, pad: 0, emi: 0, val: 0, bla: 0, nul: 0 },
@@ -115,6 +139,23 @@ export function consolidateData(): ElectionConsolidated {
     t.val += cleanNum(f["Válidos"] || f["Vlidos"]);
     t.bla += cleanNum(f["Blancos"]);
     t.nul += cleanNum(f["Nulos"]);
+
+    // Classify circuit type
+    const uniCircuits = [
+      "2.2", "2.3", "2.4", "3.2", "4.2", "4.4", "4.5", "4.6", "5.1", "5.2", 
+      "6.1", "6.2", "6.3", "7.1", "7.2", "8.1", "9.2", "9.3", "9.4", 
+      "10.1", "10.2", "12.1", "12.2", "12.3", "13.2", "13.3"
+    ];
+    const pluriCircuits = [
+      "1.1", "2.1", "3.1", "4.1", "4.3", "8.2", "8.3", "8.4", "8.5", "8.6", 
+      "9.1", "13.1", "13.4"
+    ];
+
+    if (uniCircuits.includes(c)) {
+      res[p].circuits[c].type = 'UNI';
+    } else if (pluriCircuits.includes(c)) {
+      res[p].circuits[c].type = 'PLURI';
+    }
   });
 
   segunda.forEach(f => {
@@ -153,7 +194,7 @@ export function consolidateData(): ElectionConsolidated {
     const candName = f["Candidato"]?.trim();
     if (!p || !d || !candName) return;
 
-    if (!res[p]) res[p] = { circuits: {}, mayors: {} };
+    if (!res[p]) res[p] = { circuits: {}, mayors: {}, diputados: {} };
     if (!res[p].mayors[d]) res[p].mayors[d] = {};
 
     res[p].mayors[d][candName] = {
@@ -183,7 +224,89 @@ export function consolidateData(): ElectionConsolidated {
         mesas: cleanNum(f["mesas Total"]),
         validos: cleanNum(f["Total de Votos Válidos"]),
         emitidos: cleanNum(f["Total de votos emitidos"]),
+        blancos: cleanNum(f["Votos en Blanco"]),
+        nulos: cleanNum(f["Votos Nulos"]),
         count: Object.keys(res[p].mayors).length
+      };
+    }
+  });
+
+  diputadosResumen.forEach(f => {
+    const p = normalizeProvince(f["Provincia, Comarca y Circuito Electoral"]);
+    if (res[p]) {
+      res[p].diputadoSummary = {
+        mesas: cleanNum(f["Total de Mesas"]),
+        validos: cleanNum(f["Total de Votos Válidos"]),
+        emitidos: cleanNum(f["Total de votos Emitidos"]),
+        blancos: cleanNum(f["Votos en Blanco"]),
+        nulos: cleanNum(f["Votos Nulos"])
+      };
+    }
+  });
+
+  // Parse Diputado Data
+  const diputadoLines = DIPUTADO_CSV.split('\n');
+  let currentProvince = "";
+  let currentCircuit = "";
+
+  const partyNames = [
+    "PRD", "PP", "MOLIRENA", "PANAMEÑISTA", "CD", "ALIANZA", "RM", "PAIS", "MOCA", "LP1", "LP2", "LP3"
+  ];
+
+  diputadoLines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    // Check if it's a province name (no tabs, or just the name)
+    const parts = line.split('\t');
+    
+    if (trimmed.startsWith("Circuito Electoral y Candidato")) return; // Header
+
+    if (trimmed.startsWith("Circuito")) {
+      currentCircuit = cleanCircuit(trimmed);
+      return;
+    }
+
+    // If it's a single word or a known province name
+    const possibleProvince = normalizeProvince(trimmed);
+    const knownProvinces = [
+      "Bocas del Toro", "Coclé", "Colón", "Chiriquí", "Darién", "Herrera", "Los Santos", 
+      "Panamá", "Veraguas", "Comarca Kuna Yala", "Comarca Ngäbe Buglé", "Panamá Oeste",
+      "Comarca Embera Wounaan"
+    ];
+    
+    if (knownProvinces.includes(possibleProvince)) {
+      currentProvince = possibleProvince;
+      if (!res[currentProvince]) res[currentProvince] = { circuits: {}, mayors: {}, diputados: {} };
+      return;
+    }
+
+    // Candidate row
+    if (currentProvince && currentCircuit && parts.length > 1) {
+      const candidate = parts[0].trim();
+      const total = cleanNum(parts[1]);
+      
+      if (!res[currentProvince].diputados[currentCircuit]) {
+        res[currentProvince].diputados[currentCircuit] = {};
+      }
+
+      res[currentProvince].diputados[currentCircuit][candidate] = {
+        candidate,
+        total,
+        parties: {
+          "PRD": cleanNum(parts[2]),
+          "PP": cleanNum(parts[3]),
+          "MOLIRENA": cleanNum(parts[4]),
+          "PANAMEÑISTA": cleanNum(parts[5]),
+          "CD": cleanNum(parts[6]),
+          "ALIANZA": cleanNum(parts[7]),
+          "RM": cleanNum(parts[8]),
+          "PAIS": cleanNum(parts[9]),
+          "MOCA": cleanNum(parts[10]),
+          "LP1": cleanNum(parts[11]),
+          "LP2": cleanNum(parts[12]),
+          "LP3": cleanNum(parts[13])
+        }
       };
     }
   });

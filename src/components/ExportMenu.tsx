@@ -5,7 +5,7 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { cn } from '../lib/utils';
 import { Chart as ChartJS } from 'chart.js/auto';
-import { CANDIDATE_PHOTOS, PARTY_LOGOS } from '../constants';
+import { CANDIDATE_PHOTOS, PARTY_LOGOS, ELECTION_ALLIANCES } from '../constants';
 
 interface ExportMenuProps {
   province: string;
@@ -114,9 +114,50 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     return imgData;
   };
 
+  const getConsolidatedData = () => {
+    const consolidatedCand: Record<string, number> = {};
+    const consolidatedParty: Record<string, number> = {};
+
+    if (circuit) {
+      // Individual report (data is already normalized to { cand, party })
+      return { cand: data.cand || {}, party: data.party || {} };
+    }
+
+    // Provincial report (data is a map of locations)
+    Object.values(data).forEach((loc: any) => {
+      // Handle Structure 1: { cand: { [name]: votes }, party: { [name]: votes } }
+      if (loc.cand) {
+        Object.entries(loc.cand).forEach(([cand, votes]: [string, any]) => {
+          consolidatedCand[cand] = (consolidatedCand[cand] || 0) + (votes as number);
+        });
+        if (loc.party) {
+          Object.entries(loc.party).forEach(([p, v]: [string, any]) => {
+            consolidatedParty[p] = (consolidatedParty[p] || 0) + (v as number);
+          });
+        }
+      } 
+      // Handle Structure 2: { [candidate]: { total: votes, parties: { [name]: votes } } }
+      else {
+        Object.values(loc).forEach((candObj: any) => {
+          if (candObj.candidate && candObj.total !== undefined) {
+            consolidatedCand[candObj.candidate] = (consolidatedCand[candObj.candidate] || 0) + (candObj.total as number);
+            if (candObj.parties) {
+              Object.entries(candObj.parties).forEach(([p, v]: [string, any]) => {
+                consolidatedParty[p] = (consolidatedParty[p] || 0) + (v as number);
+              });
+            }
+          }
+        });
+      }
+    });
+
+    return { cand: consolidatedCand, party: consolidatedParty };
+  };
+
   const exportToExcel = () => {
     setIsExporting(true);
     const wb = XLSX.utils.book_new();
+    const { cand: consolidatedCand, party: consolidatedParty } = getConsolidatedData();
     
     if (config.includeSummary) {
       const summaryData = [
@@ -125,11 +166,11 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
         circuit ? [label, circuit] : [''],
         [''],
         ['Categoría', 'Valor'],
-        ['Centros', summary.cen],
-        ['Mesas', summary.mes],
-        ['Padrón Electoral', summary.pad],
-        ['Votos Válidos', summary.val],
-        ['Participación', `${summary.part}%`],
+        ['Centros', summary.cen || 0],
+        ['Mesas', summary.mes || 0],
+        ['Padrón Electoral', summary.pad || 0],
+        ['Votos Válidos', summary.val || 0],
+        ['Participación', `${summary.part || '0.00'}%`],
       ];
       const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
       XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen');
@@ -138,14 +179,20 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     if (config.includeCircuits && !circuit) {
       const circuitsData: any[] = [[`DETALLE POR ${label.toUpperCase()}S`], [''], [label, 'Centros', 'Mesas', 'Padrón', 'Válidos', 'Participación']];
       Object.entries(data).forEach(([circ, c]: [string, any]) => {
-        circuitsData.push([
-          circ,
-          c.tec.cen,
-          c.tec.mes,
-          c.tec.pad,
-          c.tec.val,
-          `${((c.tec.emi / c.tec.pad) * 100).toFixed(2)}%`
-        ]);
+        if (c.tec) {
+          circuitsData.push([
+            circ,
+            c.tec.cen,
+            c.tec.mes,
+            c.tec.pad,
+            c.tec.val,
+            `${((c.tec.emi / c.tec.pad) * 100).toFixed(2)}%`
+          ]);
+        } else {
+          // For Alcalde/Diputado where tec might be missing in the passed data
+          const totalVotes = Object.values(c).reduce((acc: number, cand: any) => acc + (cand.total || 0), 0);
+          circuitsData.push([circ, '-', '-', '-', totalVotes, '-']);
+        }
       });
       const wsCircuits = XLSX.utils.aoa_to_sheet(circuitsData);
       XLSX.utils.book_append_sheet(wb, wsCircuits, `${label}s`);
@@ -153,84 +200,36 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
 
     if (config.includeCandidates) {
       const candidatesData: any[] = [['VOTOS POR CANDIDATO'], [''], [label, 'Candidato', 'Votos']];
-      if (circuit) {
-        Object.entries(data.cand)
-          .sort(([, a], [, b]) => (b as number) - (a as number))
-          .forEach(([cand, votes]: [string, any]) => {
-            candidatesData.push([circuit, cand, votes]);
-          });
-      } else {
-        const consolidated: Record<string, number> = {};
-        Object.values(data).forEach((c: any) => {
-          Object.entries(c.cand).forEach(([cand, votes]: [string, any]) => {
-            consolidated[cand] = (consolidated[cand] || 0) + votes;
-          });
+      Object.entries(consolidatedCand)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
+        .forEach(([cand, votes]) => {
+          candidatesData.push([circuit || 'PROVINCIAL', cand, votes]);
         });
-        Object.entries(consolidated)
-          .sort(([, a], [, b]) => b - a)
-          .forEach(([cand, votes]) => {
-            candidatesData.push(['PROVINCIAL', cand, votes]);
-          });
-      }
       const wsCandidates = XLSX.utils.aoa_to_sheet(candidatesData);
       XLSX.utils.book_append_sheet(wb, wsCandidates, 'Candidatos');
     }
 
     if (config.includeAlliances) {
       const alliancesData: any[] = [['VOTOS POR ALIANZA'], [''], [label, 'Alianza', 'Votos']];
-      const alliances = [
-        { name: "PRD + MOLIRENA", parties: ["PRD", "MOLIRENA"] },
-        { name: "RM + ALIANZA", parties: ["RM", "ALIANZA"] },
-        { name: "CD + PANAMEÑISTA", parties: ["CD", "PANAMEÑISTA"] },
-        { name: "MELINTON LP + PAIS", parties: ["LP3", "PAIS"] }
-      ];
-
-      if (circuit) {
-        alliances.map(a => ({
-          name: a.name,
-          votes: a.parties.reduce((acc, p) => acc + (data.party[p] || 0), 0)
-        }))
-        .sort((a, b) => b.votes - a.votes)
-        .forEach(a => alliancesData.push([circuit, a.name, a.votes]));
-      } else {
-        const consolidatedParties: Record<string, number> = {};
-        Object.values(data).forEach((c: any) => {
-          Object.entries(c.party).forEach(([p, v]: [string, any]) => {
-            consolidatedParties[p] = (consolidatedParties[p] || 0) + v;
-          });
-        });
-        alliances.map(a => ({
-          name: a.name,
-          votes: a.parties.reduce((acc, p) => acc + (consolidatedParties[p] || 0), 0)
-        }))
-        .sort((a, b) => b.votes - a.votes)
-        .forEach(a => alliancesData.push(['PROVINCIAL', a.name, a.votes]));
-      }
+      
+      ELECTION_ALLIANCES.map(a => ({
+        name: a.name,
+        votes: a.parties.reduce((acc, p) => acc + (consolidatedParty[p] || 0), 0)
+      }))
+      .sort((a, b) => (b.votes as number) - (a.votes as number))
+      .forEach(a => alliancesData.push([circuit || 'PROVINCIAL', a.name, a.votes]));
+      
       const wsAlliances = XLSX.utils.aoa_to_sheet(alliancesData);
       XLSX.utils.book_append_sheet(wb, wsAlliances, 'Alianzas');
     }
 
     if (config.includeParties) {
       const partiesData: any[] = [['VOTOS POR PARTIDO'], [''], [label, 'Partido', 'Votos']];
-      if (circuit) {
-        Object.entries(data.party)
-          .sort(([, a], [, b]) => (b as number) - (a as number))
-          .forEach(([p, v]: [string, any]) => {
-            partiesData.push([circuit, p, v]);
-          });
-      } else {
-        const consolidated: Record<string, number> = {};
-        Object.values(data).forEach((c: any) => {
-          Object.entries(c.party).forEach(([p, v]: [string, any]) => {
-            consolidated[p] = (consolidated[p] || 0) + v;
-          });
+      Object.entries(consolidatedParty)
+        .sort(([, a], [, b]) => (b as number) - (a as number))
+        .forEach(([p, v]) => {
+          partiesData.push([circuit || 'PROVINCIAL', p, v]);
         });
-        Object.entries(consolidated)
-          .sort(([, a], [, b]) => b - a)
-          .forEach(([p, v]) => {
-            partiesData.push(['PROVINCIAL', p, v]);
-          });
-      }
       const wsParties = XLSX.utils.aoa_to_sheet(partiesData);
       XLSX.utils.book_append_sheet(wb, wsParties, 'Partidos');
     }
@@ -305,6 +304,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
     
     yPos = 50;
     doc.setTextColor(0, 0, 0);
+    const { cand: consolidatedCand, party: consolidatedParty } = getConsolidatedData();
 
     if (config.includeSummary) {
       doc.setFontSize(16);
@@ -315,11 +315,11 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
         startY: yPos,
         head: [['Categoría', 'Valor']],
         body: [
-          ['Centros de Votación', summary.cen.toLocaleString()],
-          ['Mesas de Votación', summary.mes.toLocaleString()],
-          ['Padrón Electoral', summary.pad.toLocaleString()],
-          ['Votos Válidos', summary.val.toLocaleString()],
-          ['Participación Ciudadana', `${summary.part}%`],
+          ['Centros de Votación', (summary.cen || 0).toLocaleString()],
+          ['Mesas de Votación', (summary.mes || 0).toLocaleString()],
+          ['Padrón Electoral', (summary.pad || 0).toLocaleString()],
+          ['Votos Válidos', (summary.val || 0).toLocaleString()],
+          ['Participación Ciudadana', `${summary.part || '0.00'}%`],
         ],
         theme: 'striped',
         headStyles: { fillColor: [0, 51, 102] }
@@ -333,22 +333,9 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
       doc.text('2. Análisis Gráfico', 14, yPos);
       yPos += 10;
 
-      const consolidatedCandidates: Record<string, number> = {};
-      if (circuit) {
-        Object.entries(data.cand).forEach(([cand, votes]: [string, any]) => {
-          consolidatedCandidates[cand] = votes;
-        });
-      } else {
-        Object.values(data).forEach((c: any) => {
-          Object.entries(c.cand).forEach(([cand, votes]: [string, any]) => {
-            consolidatedCandidates[cand] = (consolidatedCandidates[cand] || 0) + votes;
-          });
-        });
-      }
-
-      const sortedCands = Object.entries(consolidatedCandidates).sort((a, b) => b[1] - a[1]);
+      const sortedCands = Object.entries(consolidatedCand).sort((a, b) => (b[1] as number) - (a[1] as number));
       const labels = sortedCands.map(c => c[0]);
-      const values = sortedCands.map(c => c[1]);
+      const values = sortedCands.map(c => c[1] as number);
 
       const chartImg = await generateChartImage(labels, values, circuit ? `Votos ${label} ${circuit}` : 'Votos Consolidados por Candidato');
       if (chartImg) {
@@ -363,14 +350,21 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
       doc.text(`3. Detalle por ${label}s`, 14, yPos);
       yPos += 10;
 
-      const circuitRows = Object.entries(data).map(([circ, c]: [string, any]) => [
-        circ,
-        c.tec.cen.toLocaleString(),
-        c.tec.mes.toLocaleString(),
-        c.tec.pad.toLocaleString(),
-        c.tec.val.toLocaleString(),
-        `${((c.tec.emi / c.tec.pad) * 100).toFixed(2)}%`
-      ]);
+      const circuitRows = Object.entries(data).map(([circ, c]: [string, any]) => {
+        if (c.tec) {
+          return [
+            circ,
+            c.tec.cen.toLocaleString(),
+            c.tec.mes.toLocaleString(),
+            c.tec.pad.toLocaleString(),
+            c.tec.val.toLocaleString(),
+            `${((c.tec.emi / c.tec.pad) * 100).toFixed(2)}%`
+          ];
+        } else {
+          const totalVotes = Object.values(c).reduce((acc: number, cand: any) => acc + (cand.total || 0), 0);
+          return [circ, '-', '-', '-', totalVotes.toLocaleString(), '-'];
+        }
+      });
 
       autoTable(doc, {
         startY: yPos,
@@ -388,21 +382,8 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
       doc.text(circuit ? '3. Resultados por Candidato' : '4. Resultados por Candidato', 14, yPos);
       yPos += 10;
 
-      const consolidatedCandidates: Record<string, number> = {};
-      if (circuit) {
-        Object.entries(data.cand).forEach(([cand, votes]: [string, any]) => {
-          consolidatedCandidates[cand] = votes;
-        });
-      } else {
-        Object.values(data).forEach((c: any) => {
-          Object.entries(c.cand).forEach(([cand, votes]: [string, any]) => {
-            consolidatedCandidates[cand] = (consolidatedCandidates[cand] || 0) + votes;
-          });
-        });
-      }
-
-      const candidateRows = Object.entries(consolidatedCandidates)
-        .sort((a, b) => b[1] - a[1])
+      const candidateRows = Object.entries(consolidatedCand)
+        .sort((a, b) => (b[1] as number) - (a[1] as number))
         .map(([cand, votes]) => [
           cand, 
           votes.toLocaleString(), 
@@ -439,36 +420,14 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
       doc.text(circuit ? '4. Resultados por Alianza' : '5. Resultados por Alianza', 14, yPos);
       yPos += 10;
 
-      const alliances = [
-        { name: "PRD + MOLIRENA", parties: ["PRD", "MOLIRENA"] },
-        { name: "RM + ALIANZA", parties: ["RM", "ALIANZA"] },
-        { name: "CD + PANAMEÑISTA", parties: ["CD", "PANAMEÑISTA"] },
-        { name: "MELINTON LP + PAIS", parties: ["LP3", "PAIS"] }
-      ];
-
-      let allianceResults: { name: string, votes: number, logos: string[] }[] = [];
-      if (circuit) {
-        allianceResults = alliances.map(a => ({
-          name: a.name,
-          votes: a.parties.reduce((acc, p) => acc + (data.party[p] || 0), 0),
-          logos: a.parties.map(p => PARTY_LOGOS[p] || '')
-        }));
-      } else {
-        const consolidatedParties: Record<string, number> = {};
-        Object.values(data).forEach((c: any) => {
-          Object.entries(c.party).forEach(([p, v]: [string, any]) => {
-            consolidatedParties[p] = (consolidatedParties[p] || 0) + v;
-          });
-        });
-        allianceResults = alliances.map(a => ({
-          name: a.name,
-          votes: a.parties.reduce((acc, p) => acc + (consolidatedParties[p] || 0), 0),
-          logos: a.parties.map(p => PARTY_LOGOS[p] || '')
-        }));
-      }
+      const allianceResults = ELECTION_ALLIANCES.map(a => ({
+        name: a.name,
+        votes: a.parties.reduce((acc, p) => acc + (consolidatedParty[p] || 0), 0),
+        logos: a.parties.map(p => PARTY_LOGOS[p] || '').filter(l => l !== '')
+      }));
 
       const allianceRows = allianceResults
-        .sort((a, b) => b.votes - a.votes)
+        .sort((a, b) => (b.votes as number) - (a.votes as number))
         .map(a => [
           a.name, 
           a.votes.toLocaleString(), 
@@ -509,21 +468,8 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({ province, summary, data,
       doc.text(circuit ? '5. Resultados por Partido' : '6. Resultados por Partido', 14, yPos);
       yPos += 10;
 
-      const consolidatedParties: Record<string, number> = {};
-      if (circuit) {
-        Object.entries(data.party).forEach(([p, v]: [string, any]) => {
-          consolidatedParties[p] = v;
-        });
-      } else {
-        Object.values(data).forEach((c: any) => {
-          Object.entries(c.party).forEach(([p, v]: [string, any]) => {
-            consolidatedParties[p] = (consolidatedParties[p] || 0) + v;
-          });
-        });
-      }
-
-      const partyRows = Object.entries(consolidatedParties)
-        .sort((a, b) => b[1] - a[1])
+      const partyRows = Object.entries(consolidatedParty)
+        .sort((a, b) => (b[1] as number) - (a[1] as number))
         .map(([p, v]) => [
           p, 
           v.toLocaleString(), 
