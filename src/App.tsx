@@ -769,8 +769,8 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
   const summary = useMemo(() => {
     let t = { cen: 0, mes: 0, pad: 0, val: 0, emi: 0, bla: 0, nul: 0, alc: 0, candCount: 0 };
     
-    // Technical data (Centros, Mesas, Padrón) is always from circuits
-    if (data && data.circuits) {
+    // Technical data (Centros, Mesas, Padrón) - only for Presidente by default
+    if (category === 'Presidente' && data && data.circuits) {
       Object.values(data.circuits).forEach((c: any) => {
         if (c.tec) {
           t.cen += c.tec.cen || 0;
@@ -783,7 +783,9 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
     // Válidos and Emitidos depend on category
     if (category === 'Alcalde') {
       if (data.mayorSummary) {
-        t.mes = data.mayorSummary.mesas;
+        t.mes = 0; // Explicitly 0 as per user request
+        t.cen = 0;
+        t.pad = 0;
         t.val = data.mayorSummary.validos;
         t.emi = data.mayorSummary.emitidos;
         t.bla = data.mayorSummary.blancos;
@@ -829,7 +831,9 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
       }
     } else if (category === 'Diputado') {
       if (data.diputadoSummary) {
-        t.mes = data.diputadoSummary.mesas;
+        t.mes = 0; // Explicitly 0 as per user request
+        t.cen = 0;
+        t.pad = 0;
         t.val = data.diputadoSummary.validos;
         t.emi = data.diputadoSummary.emitidos;
         t.bla = data.diputadoSummary.blancos;
