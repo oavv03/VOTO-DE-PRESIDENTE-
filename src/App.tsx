@@ -806,6 +806,8 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
     } else if (category === 'Representante') {
       if (data.representanteSummary) {
         t.mes = data.representanteSummary.mesas;
+        t.cen = data.representanteSummary.centros;
+        t.pad = data.representanteSummary.padron;
         t.val = data.representanteSummary.validos;
         t.emi = data.representanteSummary.emitidos;
         t.bla = data.representanteSummary.blancos;
@@ -919,6 +921,18 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
                   <span className="font-bold">
                     {category === 'Alcalde' ? 'Distritos:' : category === 'Representante' ? 'Corregimientos:' : 'Circuitos:'}
                   </span> {category === 'Diputado' ? Object.keys(data.diputados || {}).length : (category === 'Representante' || category === 'Alcalde') ? summary.alc : Object.keys(data.circuits || {}).length}
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
+                  <span className="font-bold">Centro de Votación:</span> {summary.cen.toLocaleString()}
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
+                  <span className="font-bold">Mesas de Votación:</span> {summary.mes.toLocaleString()}
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
+                  <span className="font-bold">Padrón Electoral:</span> {summary.pad.toLocaleString()}
                 </li>
               </ul>
             </div>

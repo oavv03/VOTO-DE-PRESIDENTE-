@@ -69,6 +69,8 @@ export interface ProvinceData {
   };
   representanteSummary?: {
     mesas: number;
+    centros: number;
+    padron: number;
     validos: number;
     emitidos: number;
     blancos: number;
@@ -82,8 +84,10 @@ export interface ElectionConsolidated {
 }
 
 function cleanNum(v: any): number {
-  if (!v) return 0;
-  return parseInt(v.toString().replace(/,/g, "")) || 0;
+  if (v === undefined || v === null || v === "") return 0;
+  const s = v.toString().replace(/,/g, "").replace(/\s/g, "").replace(/\u00a0/g, "").trim();
+  const n = parseInt(s);
+  return isNaN(n) ? 0 : n;
 }
 
 function normalizeProvince(p: string): string {
@@ -114,14 +118,15 @@ export function consolidateData(): ElectionConsolidated {
   const parseConfig = { 
     header: true, 
     skipEmptyLines: true,
-    delimiter: ";"
+    delimiter: ";",
+    transformHeader: (h: string) => h.trim()
   };
   
-  const def6 = Papa.parse(DEF6_CSV, { ...parseConfig, transformHeader: (h) => h.trim() }).data as any[];
-  const segunda = Papa.parse(SEGUNDA_CSV, { ...parseConfig, transformHeader: (h) => h.trim() }).data as any[];
-  const alcaldesResumen = Papa.parse(ALCALDE_RESUMEN_CSV, { header: true, skipEmptyLines: true, delimiter: ";" }).data as any[];
-  const diputadosResumen = Papa.parse(DIPUTADO_RESUMEN_CSV, { header: true, skipEmptyLines: true, delimiter: ";" }).data as any[];
-  const representantesResumen = Papa.parse(REPRESENTANTE_RESUMEN_CSV, { header: true, skipEmptyLines: true, delimiter: ";" }).data as any[];
+  const def6 = Papa.parse(DEF6_CSV, parseConfig).data as any[];
+  const segunda = Papa.parse(SEGUNDA_CSV, parseConfig).data as any[];
+  const alcaldesResumen = Papa.parse(ALCALDE_RESUMEN_CSV, parseConfig).data as any[];
+  const diputadosResumen = Papa.parse(DIPUTADO_RESUMEN_CSV, parseConfig).data as any[];
+  const representantesResumen = Papa.parse(REPRESENTANTE_RESUMEN_CSV, parseConfig).data as any[];
 
   const res: ElectionConsolidated = {};
 
@@ -342,21 +347,21 @@ export function consolidateData(): ElectionConsolidated {
 
   // Parse Hierarchical Representante Data
   const representanteRows = Papa.parse(REPRESENTANTE_DETALLE_CSV, { 
+    header: true,
     delimiter: "\t",
-    skipEmptyLines: true
-  }).data as string[][];
+    skipEmptyLines: true,
+    transformHeader: (h) => h.trim()
+  }).data as any[];
   
   let currentProv = "";
   let currentDist = "";
   let currentCorr = "";
 
   representanteRows.forEach(row => {
-    if (row.length < 4) return;
-    
-    const prov = (row[0] || "").trim();
-    const dist = (row[1] || "").trim();
-    const corr = (row[2] || "").trim();
-    const cand = (row[3] || "").trim();
+    const prov = (row["Provincia"] || "").trim();
+    const dist = (row["Distrito"] || "").trim();
+    const corr = (row["Corregimiento"] || "").trim();
+    const cand = (row["Corregimiento Y Candidato"] || "").trim();
     
     if (prov && prov !== "Provincia") {
       currentProv = normalizeProvince(prov);
@@ -372,7 +377,7 @@ export function consolidateData(): ElectionConsolidated {
 
     // If we have a candidate name and we are in a valid hierarchy
     if (cand && currentProv && currentDist && currentCorr) {
-      const total = cleanNum(row[4]);
+      const total = cleanNum(row["Total De Votos Válidos"]);
       
       if (!res[currentProv]) res[currentProv] = { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
       if (!res[currentProv].representantes[currentDist]) res[currentProv].representantes[currentDist] = {};
@@ -382,18 +387,18 @@ export function consolidateData(): ElectionConsolidated {
         candidate: cand,
         total: total,
         parties: {
-          "PRD": cleanNum(row[5]),
-          "PP": cleanNum(row[6]),
-          "MOLIRENA": cleanNum(row[7]),
-          "PANAMEÑISTA": cleanNum(row[8]),
-          "CD": cleanNum(row[9]),
-          "ALIANZA": cleanNum(row[10]),
-          "RM": cleanNum(row[11]),
-          "PAIS": cleanNum(row[12]),
-          "MOCA": cleanNum(row[13]),
-          "LP1": cleanNum(row[14]),
-          "LP2": cleanNum(row[15]),
-          "LP3": cleanNum(row[16])
+          "PRD": cleanNum(row["PRD"]),
+          "PP": cleanNum(row["P. Popular"]),
+          "MOLIRENA": cleanNum(row["MOLIRENA"]),
+          "PANAMEÑISTA": cleanNum(row["P. Panameñista"]),
+          "CD": cleanNum(row["CD"]),
+          "ALIANZA": cleanNum(row["P. Alianza"]),
+          "RM": cleanNum(row["Realizando Metas"]),
+          "PAIS": cleanNum(row["PAIS"]),
+          "MOCA": cleanNum(row["MOCA"]),
+          "LP1": cleanNum(row["Libre Postulación (1)"]),
+          "LP2": cleanNum(row["Libre Postulación (2)"]),
+          "LP3": cleanNum(row["Libre Postulación (3)"])
         }
       };
     }
@@ -404,6 +409,8 @@ export function consolidateData(): ElectionConsolidated {
     if (!p || !res[p]) return;
     res[p].representanteSummary = {
       mesas: cleanNum(f["Mesas"]),
+      centros: cleanNum(f["Centros"]),
+      padron: cleanNum(f["Padrón"]),
       validos: cleanNum(f["Votos Válidos"]),
       emitidos: cleanNum(f["Votos Emitidos"]),
       blancos: cleanNum(f["Votos en Blanco"]),

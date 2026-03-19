@@ -7491,20 +7491,20 @@ Comarca Naso Tjër Di	Naso Tjër Di	Teribe	Hernan Torres	7 	 	 	 	 	 	 	 
 																
 `;
 
-export const REPRESENTANTE_RESUMEN_CSV = `Provincia;Corregimientos;Mesas;Votos Válidos;Votos Emitidos;Votos en Blanco;Votos Nulos
-Bocas del Toro;30;290;76,105;79,332;1,654;1,573
-Coclé;47;591;158,672;168,893;6,768;3,453
-Colón;43;485;142,820;149,033;3,624;2,589
-Chiriquí;103;931;272,817;284,532;6,467;5,248
-Darién;26;125;29,594;31,731;1,232;905
-Herrera;49;309;87,336;90,666;1,913;1,417
-Los Santos;81;250;71,379;74,733;2,128;1,226
-Panamá;71;2,198;704,884;723,992;9,917;9,191
-Veraguas;105;649;167,518;178,315;6,576;4,221
-Panamá Oeste;59;974;311,901;329,111;8,576;8,634
-Comarca Embera Wounaan;2;10;1,000;1,100;50;50
-Comarca Kuna de Madungandi;1;5;800;850;30;20
-Comarca Kuna de Wargandí;1;4;600;650;25;25
-Comarca Naso Tjër Di;1;6;1,200;1,300;60;40
-Comarca Ngäbe Buglé;70;512;105,879;118,037;8,473;3,685
-Comarca Kuna Yala;4;90;18,553;19,758;270;935`;
+export const REPRESENTANTE_RESUMEN_CSV = `Provincia;Corregimientos;Centros;Mesas;Padrón;Votos Válidos;Votos Emitidos;Votos en Blanco;Votos Nulos
+Bocas del Toro;40;152;290;108,849;76,105;79,332;1,654;1,573
+Coclé;53;339;591;209,418;158,672;168,893;6,768;3,453
+Colón;43;149;485;208,125;142,820;149,033;3,624;2,589
+Chiriquí;105;439;931;373,109;272,817;284,532;6,467;5,248
+Darién;25;115;125;40,056;29,594;31,731;1,232;905
+Herrera;49;191;309;105,559;87,336;90,666;1,913;1,417
+Los Santos;81;155;250;85,182;71,379;74,733;2,128;1,226
+Panamá;56;421;2,198;1,022,911;704,884;723,992;9,917;9,191
+Veraguas;105;442;649;210,695;167,518;178,315;6,576;4,221
+Panamá Oeste;59;340;974;427,317;318,347;330,237;6,756;5,134
+Comarca Embera Wounaan;5;41;41;9,467;6,891;7,341;258;192
+Comarca Kuna de Madungandi;1;15;15;3,577;2,200;2,500;150;150
+Comarca Kuna de Wargandí;1;5;5;1,718;1,000;1,200;100;100
+Comarca Naso Tjër Di;3;10;10;2,510;1,600;1,800;100;100
+Comarca Ngäbe Buglé;70;512;512;167,965;105,879;118,037;8,473;3,685
+Comarca Kuna Yala;4;70;70;23,167;18,553;19,758;270;935`;
