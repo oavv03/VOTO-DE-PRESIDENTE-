@@ -1111,7 +1111,6 @@ const ELECTORAL_CATEGORIES = [
   { id: 'Alcalde', label: 'Alcalde', icon: <Users size={20} /> },
   { id: 'Representante', label: 'Representante', icon: <MapPin size={20} /> },
   { id: 'Concejal', label: 'Concejal', icon: <BarChart3 size={20} /> },
-  { id: 'Parlacen', label: 'Parlacen', icon: <Globe size={20} /> },
 ];
 
 export default function App() {
@@ -1140,7 +1139,6 @@ export default function App() {
                 {cat.id === 'Alcalde' && <Users size={18} />}
                 {cat.id === 'Representante' && <MapPin size={18} />}
                 {cat.id === 'Concejal' && <BarChart3 size={18} />}
-                {cat.id === 'Parlacen' && <Globe size={18} />}
                 <span>{cat.label}</span>
               </button>
             ))}
@@ -1160,7 +1158,7 @@ export default function App() {
             hasData = Object.keys(provinceData.mayors || {}).length > 0;
           } else if (activeCategory === 'Diputado') {
             hasData = Object.keys(provinceData.diputados || {}).length > 0;
-          } else if (activeCategory === 'Representante' || activeCategory === 'Concejal' || activeCategory === 'Parlacen') {
+          } else if (activeCategory === 'Representante' || activeCategory === 'Concejal') {
             // Always show all provinces for these categories as requested
             hasData = true;
           }
@@ -1189,7 +1187,7 @@ export default function App() {
             hasData = Object.keys(provinceData.mayors || {}).length > 0;
           } else if (activeCategory === 'Diputado') {
             hasData = Object.keys(provinceData.diputados || {}).length > 0;
-          } else if (activeCategory === 'Representante' || activeCategory === 'Concejal' || activeCategory === 'Parlacen') {
+          } else if (activeCategory === 'Representante' || activeCategory === 'Concejal') {
             // Always show all provinces for these categories as requested
             hasData = true;
           }
