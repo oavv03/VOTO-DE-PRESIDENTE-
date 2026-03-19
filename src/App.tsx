@@ -30,7 +30,8 @@ ChartJS.register(
 const PROVINCE_ORDER = [
   "Bocas del Toro", "Coclé", "Colón", "Chiriquí", "Darién", "Herrera",
   "Los Santos", "Panamá", "Veraguas", "Comarca Kuna Yala",
-  "Comarca Ngäbe Buglé", "Comarca Embera Wounaan", "Panamá Oeste"
+  "Comarca Ngäbe Buglé", "Panamá Oeste", "Comarca Embera Wounaan",
+  "Comarca Kuna de Madungandi", "Comarca Kuna de Wargandí", "Comarca Naso Tjër Di"
 ];
 
 const CANDIDATE_COLORS = [
@@ -639,10 +640,129 @@ const DiputadoDetails = ({ circuit, data, province, fullCircuitData }: { circuit
   );
 };
 
+const RepresentanteDetails = ({ district, data, province }: { district: string; data: DistrictMayorData; province: string }) => {
+  const sortedCandidates = useMemo(() => {
+    return Object.values(data).sort((a, b) => b.total - a.total);
+  }, [data]);
+
+  const districtSummary = useMemo(() => {
+    const totalValidos = Object.values(data).reduce((acc, c) => acc + c.total, 0);
+    return {
+      cen: 0,
+      mes: 0,
+      pad: 0,
+      val: totalValidos,
+      part: "0"
+    };
+  }, [data]);
+
+  const exportData = useMemo(() => {
+    const cand: Record<string, number> = {};
+    Object.values(data).forEach(c => {
+      cand[c.candidate] = c.total;
+    });
+
+    const party: Record<string, number> = {};
+    Object.values(data).forEach(cand => {
+      Object.entries(cand.parties).forEach(([p, v]) => {
+        party[p] = (party[p] || 0) + (v as number);
+      });
+    });
+
+    return { cand, party };
+  }, [data]);
+
+  const labels = sortedCandidates.map(c => c.candidate);
+  const values = sortedCandidates.map(c => c.total);
+
+  const barData = {
+    labels,
+    datasets: [{
+      label: 'Votos',
+      data: values,
+      backgroundColor: '#0055aa',
+    }]
+  };
+
+  return (
+    <div className="p-4 bg-gray-50 border-t border-gray-200 animate-in fade-in slide-in-from-top-2 duration-300">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2 text-blue-900 font-bold">
+          <MapPin size={18} />
+          <span>Detalles del Corregimiento {district}</span>
+        </div>
+        <ExportMenu 
+          province={province} 
+          summary={districtSummary} 
+          data={exportData} 
+          circuit={district} 
+          label="Corregimiento" 
+        />
+      </div>
+      <div className="mb-6">
+        <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 border-l-4 border-blue-600 pl-2 bg-gray-100 py-1">
+          Distribución de Votos
+        </h4>
+        <div className="h-[300px] w-full bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+          <Bar 
+            data={barData} 
+            options={{ 
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true } }
+            }} 
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {sortedCandidates.map((c, i) => (
+          <div key={c.candidate} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div className="relative">
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-100 bg-gray-50">
+                <img 
+                  src={CANDIDATE_PHOTOS[c.candidate] || `https://picsum.photos/seed/${c.candidate}/200`} 
+                  alt={c.candidate}
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div className="absolute -top-1 -left-1 w-6 h-6 bg-blue-900 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
+                #{i + 1}
+              </div>
+            </div>
+            <div className="flex-1">
+              <h5 className="font-bold text-gray-900 leading-tight mb-1">{c.candidate}</h5>
+              <div className="flex items-center gap-2 mb-2">
+                {Object.entries(c.parties).filter(([, v]) => (v as number) > 0).map(([p]) => (
+                  <img 
+                    key={p} 
+                    src={PARTY_LOGOS[p]} 
+                    alt={p} 
+                    className="h-4 object-contain"
+                    title={p}
+                    referrerPolicy="no-referrer"
+                  />
+                ))}
+              </div>
+              <div className="flex items-end justify-between">
+                <span className="text-2xl font-black text-blue-900">{c.total.toLocaleString()}</span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Votos</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openCircuit, setOpenCircuit] = useState<string | null>(null);
-  const [openDistrict, setOpenDistrict] = useState<string | null>(null);
+  const [openMayorDistrict, setOpenMayorDistrict] = useState<string | null>(null);
+  const [openRepresentanteDistrict, setOpenRepresentanteDistrict] = useState<string | null>(null);
+  const [openRepresentante, setOpenRepresentante] = useState<string | null>(null);
   const [openDiputadoCircuit, setOpenDiputadoCircuit] = useState<string | null>(null);
   const [diputadoFilter, setDiputadoFilter] = useState<'ALL' | 'UNI' | 'PLURI'>('ALL');
 
@@ -682,6 +802,28 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
           }
         });
         if (!data.mayorSummary) t.emi = t.val;
+      }
+    } else if (category === 'Representante') {
+      if (data.representanteSummary) {
+        t.mes = data.representanteSummary.mesas;
+        t.val = data.representanteSummary.validos;
+        t.emi = data.representanteSummary.emitidos;
+        t.bla = data.representanteSummary.blancos;
+        t.nul = data.representanteSummary.nulos;
+        t.alc = data.representanteSummary.count;
+      }
+      
+      if (data.representantes) {
+        if (!data.representanteSummary) t.alc = Object.keys(data.representantes).length;
+        Object.values(data.representantes).forEach((district: any) => {
+          t.candCount += Object.keys(district).length;
+          if (!data.representanteSummary) {
+            Object.values(district).forEach((cand: any) => {
+              t.val += cand.total || 0;
+            });
+          }
+        });
+        if (!data.representanteSummary) t.emi = t.val;
       }
     } else if (category === 'Diputado') {
       if (data.diputadoSummary) {
@@ -752,7 +894,7 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
                 <ExportMenu 
                   province={province} 
                   summary={summary} 
-                  data={category === 'Alcalde' ? data.mayors : category === 'Diputado' ? data.diputados : data.circuits} 
+                  data={category === 'Alcalde' ? data.mayors : category === 'Diputado' ? data.diputados : category === 'Representante' ? data.representantes : data.circuits} 
                 />
               </div>
               <ul className="space-y-3 text-slate-700">
@@ -774,7 +916,9 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
-                  <span className="font-bold">Circuitos:</span> {category === 'Diputado' ? Object.keys(data.diputados || {}).length : Object.keys(data.circuits || {}).length}
+                  <span className="font-bold">
+                    {category === 'Alcalde' ? 'Distritos:' : category === 'Representante' ? 'Corregimientos:' : 'Circuitos:'}
+                  </span> {category === 'Diputado' ? Object.keys(data.diputados || {}).length : (category === 'Representante' || category === 'Alcalde') ? summary.alc : Object.keys(data.circuits || {}).length}
                 </li>
               </ul>
             </div>
@@ -815,16 +959,16 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
                 {Object.keys(data.mayors).map((district) => (
                   <div key={district} className="border border-gray-200 rounded-lg overflow-hidden">
                     <button
-                      onClick={() => setOpenDistrict(openDistrict === district ? null : district)}
+                      onClick={() => setOpenMayorDistrict(openMayorDistrict === district ? null : district)}
                       className={cn(
                         "w-full flex items-center justify-between p-3 text-left font-semibold transition-colors",
-                        openDistrict === district ? "bg-blue-50 text-blue-900" : "bg-white hover:bg-gray-50"
+                        openMayorDistrict === district ? "bg-blue-50 text-blue-900" : "bg-white hover:bg-gray-50"
                       )}
                     >
                       <span>{district}</span>
-                      {openDistrict === district ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      {openMayorDistrict === district ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                     </button>
-                    {openDistrict === district && (
+                    {openMayorDistrict === district && (
                       <MayorDetails district={district} data={data.mayors[district]} province={province} />
                     )}
                   </div>
@@ -895,6 +1039,65 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
                   ))}
               </div>
             </div>
+          ) : category === 'Representante' && data.representantes && Object.keys(data.representantes).length > 0 ? (
+            <div className="mt-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <MapPin className="text-blue-600" /> Distritos y Corregimientos
+              </h3>
+              <div className="space-y-4">
+                {Object.keys(data.representantes).map((district) => (
+                  <div key={district} className="border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <button
+                      onClick={() => setOpenRepresentanteDistrict(openRepresentanteDistrict === district ? null : district)}
+                      className={cn(
+                        "w-full flex items-center justify-between p-4 text-left font-bold transition-all",
+                        openRepresentanteDistrict === district ? "bg-blue-900 text-white" : "bg-white hover:bg-gray-50 text-blue-900"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "w-8 h-8 rounded-lg flex items-center justify-center text-sm",
+                          openRepresentanteDistrict === district ? "bg-blue-800 text-white" : "bg-blue-100 text-blue-700"
+                        )}>
+                          {Object.keys(data.representantes[district]).length}
+                        </div>
+                        <span>Distrito: {district}</span>
+                      </div>
+                      {openRepresentanteDistrict === district ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </button>
+                    
+                    {openRepresentanteDistrict === district && (
+                      <div className="p-4 bg-gray-50 space-y-2">
+                        {Object.keys(data.representantes[district]).map((corregimiento) => (
+                          <div key={corregimiento} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+                            <button
+                              onClick={() => setOpenRepresentante(openRepresentante === corregimiento ? null : corregimiento)}
+                              className={cn(
+                                "w-full flex items-center justify-between p-3 text-left font-semibold transition-colors",
+                                openRepresentante === corregimiento ? "bg-blue-100 text-blue-900" : "bg-white hover:bg-gray-50"
+                              )}
+                            >
+                              <div className="flex items-center gap-2">
+                                <MapPin size={16} className="text-blue-600" />
+                                <span>{corregimiento}</span>
+                              </div>
+                              {openRepresentante === corregimiento ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                            </button>
+                            {openRepresentante === corregimiento && (
+                              <RepresentanteDetails 
+                                district={corregimiento} 
+                                data={data.representantes[district][corregimiento]} 
+                                province={province} 
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           ) : null}
         </div>
       )}
@@ -947,8 +1150,7 @@ export default function App() {
 
       <main className="max-w-5xl mx-auto px-4 pt-8">
         {PROVINCE_ORDER.map((province, idx) => {
-          const provinceData = data[province];
-          if (!provinceData) return null;
+          const provinceData = data[province] || { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
 
           // Check if there is data for the category
           let hasData = false;
@@ -958,6 +1160,9 @@ export default function App() {
             hasData = Object.keys(provinceData.mayors || {}).length > 0;
           } else if (activeCategory === 'Diputado') {
             hasData = Object.keys(provinceData.diputados || {}).length > 0;
+          } else if (activeCategory === 'Representante' || activeCategory === 'Concejal' || activeCategory === 'Parlacen') {
+            // Always show all provinces for these categories as requested
+            hasData = true;
           }
 
           if (!hasData) return null;
@@ -974,7 +1179,7 @@ export default function App() {
         })}
 
         {/* Handle cases not in the predefined order if any */}
-        {Object.keys(data).filter(p => !PROVINCE_ORDER.includes(p)).map((province, idx) => {
+        {Object.keys(data).filter(p => !PROVINCE_ORDER.includes(p) && p !== "Comarca Embera Wounaan").map((province, idx) => {
           const provinceData = data[province];
           
           let hasData = false;
@@ -984,6 +1189,9 @@ export default function App() {
             hasData = Object.keys(provinceData.mayors || {}).length > 0;
           } else if (activeCategory === 'Diputado') {
             hasData = Object.keys(provinceData.diputados || {}).length > 0;
+          } else if (activeCategory === 'Representante' || activeCategory === 'Concejal' || activeCategory === 'Parlacen') {
+            // Always show all provinces for these categories as requested
+            hasData = true;
           }
 
           if (!hasData) return null;

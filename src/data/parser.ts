@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import { DEF6_CSV, SEGUNDA_CSV, ALCALDE_DETALLE_CSV, ALCALDE_RESUMEN_CSV, DIPUTADO_CSV, DIPUTADO_RESUMEN_CSV } from './electionData';
+import { DEF6_CSV, SEGUNDA_CSV, ALCALDE_DETALLE_CSV, ALCALDE_RESUMEN_CSV, DIPUTADO_CSV, DIPUTADO_RESUMEN_CSV, REPRESENTANTE_DETALLE_CSV, REPRESENTANTE_RESUMEN_CSV } from './electionData';
 
 export interface TechData {
   cen: number;
@@ -51,6 +51,7 @@ export interface ProvinceData {
   circuits: { [circuit: string]: CircuitData };
   mayors: { [district: string]: DistrictMayorData };
   diputados: { [circuit: string]: CircuitDiputadoData };
+  representantes: { [district: string]: { [corregimiento: string]: DistrictMayorData } };
   mayorSummary?: {
     mesas: number;
     validos: number;
@@ -65,6 +66,14 @@ export interface ProvinceData {
     emitidos: number;
     blancos: number;
     nulos: number;
+  };
+  representanteSummary?: {
+    mesas: number;
+    validos: number;
+    emitidos: number;
+    blancos: number;
+    nulos: number;
+    count: number;
   };
 }
 
@@ -88,10 +97,15 @@ function normalizeProvince(p: string): string {
     "Panama": "Panamá",
     "Panama Oeste": "Panamá Oeste",
     "Ngabe Bugle": "Comarca Ngäbe Buglé",
+    "Comarca Ngäbe-Buglé": "Comarca Ngäbe Buglé",
     "Embera Wounaan": "Comarca Embera Wounaan",
-    "Kuna Yala": "Comarca Kuna Yala",
     "Comarca Emberá": "Comarca Embera Wounaan",
-    "Comarca Ngabe Bugle": "Comarca Ngäbe Buglé"
+    "Comarca Emberá Wounaán": "Comarca Embera Wounaan",
+    "Kuna Yala": "Comarca Kuna Yala",
+    "Comarca Kuna Yala": "Comarca Kuna Yala",
+    "Comarca Kuna de Madungandi": "Comarca Kuna de Madungandi",
+    "Comarca Kuna de Wargandí": "Comarca Kuna de Wargandí",
+    "Comarca Naso Tjër Di": "Comarca Naso Tjër Di"
   };
   return mapping[normalized] || normalized;
 }
@@ -105,9 +119,9 @@ export function consolidateData(): ElectionConsolidated {
   
   const def6 = Papa.parse(DEF6_CSV, { ...parseConfig, transformHeader: (h) => h.trim() }).data as any[];
   const segunda = Papa.parse(SEGUNDA_CSV, { ...parseConfig, transformHeader: (h) => h.trim() }).data as any[];
-  const alcaldes = Papa.parse(ALCALDE_DETALLE_CSV, { header: true, skipEmptyLines: true, delimiter: "," }).data as any[];
   const alcaldesResumen = Papa.parse(ALCALDE_RESUMEN_CSV, { header: true, skipEmptyLines: true, delimiter: ";" }).data as any[];
   const diputadosResumen = Papa.parse(DIPUTADO_RESUMEN_CSV, { header: true, skipEmptyLines: true, delimiter: ";" }).data as any[];
+  const representantesResumen = Papa.parse(REPRESENTANTE_RESUMEN_CSV, { header: true, skipEmptyLines: true, delimiter: ";" }).data as any[];
 
   const res: ElectionConsolidated = {};
 
@@ -121,7 +135,7 @@ export function consolidateData(): ElectionConsolidated {
     const p = normalizeProvince(f["Provincia"]);
     const c = cleanCircuit(f["Circuito"]);
     if (!p || !c) return;
-    if (!res[p]) res[p] = { circuits: {}, mayors: {}, diputados: {} };
+    if (!res[p]) res[p] = { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
     if (!res[p].circuits[c]) {
       res[p].circuits[c] = {
         tec: { cen: 0, mes: 0, esc: 0, pad: 0, emi: 0, val: 0, bla: 0, nul: 0 },
@@ -188,33 +202,52 @@ export function consolidateData(): ElectionConsolidated {
     }
   });
 
-  alcaldes.forEach(f => {
-    const p = normalizeProvince(f["Provincia"]);
-    const d = f["Distrito"]?.trim();
-    const candName = f["Candidato"]?.trim();
-    if (!p || !d || !candName) return;
+  // Parse Hierarchical Alcalde Data
+  const alcaldeRows = Papa.parse(ALCALDE_DETALLE_CSV, { delimiter: ";" }).data as string[][];
+  let currentAlcaldeProv = "";
+  let currentAlcaldeDist = "";
 
-    if (!res[p]) res[p] = { circuits: {}, mayors: {}, diputados: {} };
-    if (!res[p].mayors[d]) res[p].mayors[d] = {};
+  alcaldeRows.forEach(row => {
+    if (row.length === 0) return;
+    
+    const firstCol = row[0] || "";
+    const trimmed = firstCol.trim();
+    if (!trimmed || trimmed.startsWith("Provincia")) return;
 
-    res[p].mayors[d][candName] = {
-      candidate: candName,
-      total: cleanNum(f["Total_Votos"]),
-      parties: {
-        "PRD": cleanNum(f["PRD"]),
-        "PP": cleanNum(f["P_Popular"]),
-        "MOLIRENA": cleanNum(f["MOLIRENA"]),
-        "PANAMEÑISTA": cleanNum(f["P_Panamenista"]),
-        "CD": cleanNum(f["CD"]),
-        "ALIANZA": cleanNum(f["P_Alianza"]),
-        "RM": cleanNum(f["Realizando_Metas"]),
-        "PAIS": cleanNum(f["PAIS"]),
-        "MOCA": cleanNum(f["Movimiento_Otro_Camino"]),
-        "LP1": cleanNum(f["Libre_Postulacion_1"]),
-        "LP2": cleanNum(f["Libre_Postulacion_2"]),
-        "LP3": cleanNum(f["Libre_Postulacion_3"])
-      }
-    };
+    // Detect hierarchy based on leading spaces
+    const leadingSpaces = firstCol.length - firstCol.trimStart().length;
+
+    if (leadingSpaces === 0) {
+      currentAlcaldeProv = normalizeProvince(trimmed);
+      currentAlcaldeDist = "";
+    } else if (leadingSpaces === 2) {
+      currentAlcaldeDist = trimmed;
+    } else if (leadingSpaces >= 4 && currentAlcaldeProv && currentAlcaldeDist) {
+      const candName = trimmed;
+      const total = cleanNum(row[1]);
+      
+      if (!res[currentAlcaldeProv]) res[currentAlcaldeProv] = { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
+      if (!res[currentAlcaldeProv].mayors[currentAlcaldeDist]) res[currentAlcaldeProv].mayors[currentAlcaldeDist] = {};
+
+      res[currentAlcaldeProv].mayors[currentAlcaldeDist][candName] = {
+        candidate: candName,
+        total: total,
+        parties: {
+          "PRD": cleanNum(row[2]),
+          "PP": cleanNum(row[3]),
+          "MOLIRENA": cleanNum(row[4]),
+          "PANAMEÑISTA": cleanNum(row[5]),
+          "CD": cleanNum(row[6]),
+          "ALIANZA": cleanNum(row[7]),
+          "RM": cleanNum(row[8]),
+          "PAIS": cleanNum(row[9]),
+          "MOCA": cleanNum(row[10]),
+          "LP1": cleanNum(row[11]),
+          "LP2": cleanNum(row[12]),
+          "LP3": cleanNum(row[13])
+        }
+      };
+    }
   });
 
   alcaldesResumen.forEach(f => {
@@ -249,10 +282,6 @@ export function consolidateData(): ElectionConsolidated {
   let currentProvince = "";
   let currentCircuit = "";
 
-  const partyNames = [
-    "PRD", "PP", "MOLIRENA", "PANAMEÑISTA", "CD", "ALIANZA", "RM", "PAIS", "MOCA", "LP1", "LP2", "LP3"
-  ];
-
   diputadoLines.forEach(line => {
     const trimmed = line.trim();
     if (!trimmed) return;
@@ -272,12 +301,12 @@ export function consolidateData(): ElectionConsolidated {
     const knownProvinces = [
       "Bocas del Toro", "Coclé", "Colón", "Chiriquí", "Darién", "Herrera", "Los Santos", 
       "Panamá", "Veraguas", "Comarca Kuna Yala", "Comarca Ngäbe Buglé", "Panamá Oeste",
-      "Comarca Embera Wounaan"
+      "Comarca Embera Wounaan", "Comarca Kuna de Madungandi", "Comarca Kuna de Wargandí", "Comarca Naso Tjër Di"
     ];
     
     if (knownProvinces.includes(possibleProvince)) {
       currentProvince = possibleProvince;
-      if (!res[currentProvince]) res[currentProvince] = { circuits: {}, mayors: {}, diputados: {} };
+      if (!res[currentProvince]) res[currentProvince] = { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
       return;
     }
 
@@ -309,6 +338,78 @@ export function consolidateData(): ElectionConsolidated {
         }
       };
     }
+  });
+
+  // Parse Hierarchical Representante Data
+  const representanteRows = Papa.parse(REPRESENTANTE_DETALLE_CSV, { 
+    delimiter: "\t",
+    skipEmptyLines: true
+  }).data as string[][];
+  
+  let currentProv = "";
+  let currentDist = "";
+  let currentCorr = "";
+
+  representanteRows.forEach(row => {
+    if (row.length < 4) return;
+    
+    const prov = (row[0] || "").trim();
+    const dist = (row[1] || "").trim();
+    const corr = (row[2] || "").trim();
+    const cand = (row[3] || "").trim();
+    
+    if (prov && prov !== "Provincia") {
+      currentProv = normalizeProvince(prov);
+    }
+    
+    if (dist) {
+      currentDist = dist;
+    }
+    
+    if (corr) {
+      currentCorr = corr;
+    }
+
+    // If we have a candidate name and we are in a valid hierarchy
+    if (cand && currentProv && currentDist && currentCorr) {
+      const total = cleanNum(row[4]);
+      
+      if (!res[currentProv]) res[currentProv] = { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
+      if (!res[currentProv].representantes[currentDist]) res[currentProv].representantes[currentDist] = {};
+      if (!res[currentProv].representantes[currentDist][currentCorr]) res[currentProv].representantes[currentDist][currentCorr] = {};
+
+      res[currentProv].representantes[currentDist][currentCorr][cand] = {
+        candidate: cand,
+        total: total,
+        parties: {
+          "PRD": cleanNum(row[5]),
+          "PP": cleanNum(row[6]),
+          "MOLIRENA": cleanNum(row[7]),
+          "PANAMEÑISTA": cleanNum(row[8]),
+          "CD": cleanNum(row[9]),
+          "ALIANZA": cleanNum(row[10]),
+          "RM": cleanNum(row[11]),
+          "PAIS": cleanNum(row[12]),
+          "MOCA": cleanNum(row[13]),
+          "LP1": cleanNum(row[14]),
+          "LP2": cleanNum(row[15]),
+          "LP3": cleanNum(row[16])
+        }
+      };
+    }
+  });
+
+  representantesResumen.forEach(f => {
+    const p = normalizeProvince(f["Provincia"]);
+    if (!p || !res[p]) return;
+    res[p].representanteSummary = {
+      mesas: cleanNum(f["Mesas"]),
+      validos: cleanNum(f["Votos Válidos"]),
+      emitidos: cleanNum(f["Votos Emitidos"]),
+      blancos: cleanNum(f["Votos en Blanco"]),
+      nulos: cleanNum(f["Votos Nulos"]),
+      count: cleanNum(f["Corregimientos"])
+    };
   });
 
   return res;
