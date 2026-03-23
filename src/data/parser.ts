@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import { DEF6_CSV, SEGUNDA_CSV, ALCALDE_DETALLE_CSV, ALCALDE_RESUMEN_CSV, DIPUTADO_CSV, DIPUTADO_RESUMEN_CSV, REPRESENTANTE_DETALLE_CSV, REPRESENTANTE_RESUMEN_CSV } from './electionData';
+import { DEF6_CSV, SEGUNDA_CSV, ALCALDE_DETALLE_CSV, ALCALDE_RESUMEN_CSV, DIPUTADO_CSV, DIPUTADO_RESUMEN_CSV, REPRESENTANTE_DETALLE_CSV, REPRESENTANTE_RESUMEN_CSV, CONCEJAL_CSV } from './electionData';
 
 export interface TechData {
   cen: number;
@@ -34,7 +34,14 @@ export interface MayorData {
 }
 
 export interface DistrictMayorData {
-  [candidate: string]: MayorData;
+  candidates: { [candidate: string]: MayorData };
+  summary?: {
+    mesas: number;
+    validos: number;
+    emitidos: number;
+    blancos: number;
+    nulos: number;
+  };
 }
 
 export interface DiputadoData {
@@ -52,6 +59,7 @@ export interface ProvinceData {
   mayors: { [district: string]: DistrictMayorData };
   diputados: { [circuit: string]: CircuitDiputadoData };
   representantes: { [district: string]: { [corregimiento: string]: DistrictMayorData } };
+  concejales: { [district: string]: DistrictMayorData };
   mayorSummary?: {
     mesas: number;
     validos: number;
@@ -127,6 +135,7 @@ export function consolidateData(): ElectionConsolidated {
   const alcaldesResumen = Papa.parse(ALCALDE_RESUMEN_CSV, parseConfig).data as any[];
   const diputadosResumen = Papa.parse(DIPUTADO_RESUMEN_CSV, parseConfig).data as any[];
   const representantesResumen = Papa.parse(REPRESENTANTE_RESUMEN_CSV, parseConfig).data as any[];
+  const concejalesData = Papa.parse(CONCEJAL_CSV, parseConfig).data as any[];
 
   const res: ElectionConsolidated = {};
 
@@ -140,7 +149,7 @@ export function consolidateData(): ElectionConsolidated {
     const p = normalizeProvince(f["Provincia"]);
     const c = cleanCircuit(f["Circuito"]);
     if (!p || !c) return;
-    if (!res[p]) res[p] = { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
+    if (!res[p]) res[p] = { circuits: {}, mayors: {}, diputados: {}, representantes: {}, concejales: {} };
     if (!res[p].circuits[c]) {
       res[p].circuits[c] = {
         tec: { cen: 0, mes: 0, esc: 0, pad: 0, emi: 0, val: 0, bla: 0, nul: 0 },
@@ -231,10 +240,12 @@ export function consolidateData(): ElectionConsolidated {
       const candName = trimmed;
       const total = cleanNum(row[1]);
       
-      if (!res[currentAlcaldeProv]) res[currentAlcaldeProv] = { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
-      if (!res[currentAlcaldeProv].mayors[currentAlcaldeDist]) res[currentAlcaldeProv].mayors[currentAlcaldeDist] = {};
+      if (!res[currentAlcaldeProv]) res[currentAlcaldeProv] = { circuits: {}, mayors: {}, diputados: {}, representantes: {}, concejales: {} };
+      if (!res[currentAlcaldeProv].mayors[currentAlcaldeDist]) {
+        res[currentAlcaldeProv].mayors[currentAlcaldeDist] = { candidates: {} };
+      }
 
-      res[currentAlcaldeProv].mayors[currentAlcaldeDist][candName] = {
+      res[currentAlcaldeProv].mayors[currentAlcaldeDist].candidates[candName] = {
         candidate: candName,
         total: total,
         parties: {
@@ -256,16 +267,34 @@ export function consolidateData(): ElectionConsolidated {
   });
 
   alcaldesResumen.forEach(f => {
-    const p = normalizeProvince(f["Provincia Y Distrito"]);
+    const pAndD = f["Provincia Y Distrito"] || "";
+    const p = normalizeProvince(pAndD);
+    
+    // Check if it's a province summary or district summary
     if (res[p]) {
-      res[p].mayorSummary = {
-        mesas: cleanNum(f["mesas Total"]),
-        validos: cleanNum(f["Total de Votos Válidos"]),
-        emitidos: cleanNum(f["Total de votos emitidos"]),
-        blancos: cleanNum(f["Votos en Blanco"]),
-        nulos: cleanNum(f["Votos Nulos"]),
-        count: Object.keys(res[p].mayors).length
-      };
+      // If it's just the province name, it's a province summary
+      if (pAndD.trim() === p || pAndD.trim() === normalizeProvince(p)) {
+        res[p].mayorSummary = {
+          mesas: cleanNum(f["mesas Total"]),
+          validos: cleanNum(f["Total de Votos Válidos"]),
+          emitidos: cleanNum(f["Total de votos emitidos"]),
+          blancos: cleanNum(f["Votos en Blanco"]),
+          nulos: cleanNum(f["Votos Nulos"]),
+          count: Object.keys(res[p].mayors).length
+        };
+      } else {
+        // It's a district summary
+        const district = pAndD.replace(p, "").trim().replace(/^,/, "").trim();
+        if (res[p].mayors[district]) {
+          res[p].mayors[district].summary = {
+            mesas: cleanNum(f["mesas Total"]),
+            validos: cleanNum(f["Total de Votos Válidos"]),
+            emitidos: cleanNum(f["Total de votos emitidos"]),
+            blancos: cleanNum(f["Votos en Blanco"]),
+            nulos: cleanNum(f["Votos Nulos"])
+          };
+        }
+      }
     }
   });
 
@@ -311,7 +340,7 @@ export function consolidateData(): ElectionConsolidated {
     
     if (knownProvinces.includes(possibleProvince)) {
       currentProvince = possibleProvince;
-      if (!res[currentProvince]) res[currentProvince] = { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
+      if (!res[currentProvince]) res[currentProvince] = { circuits: {}, mayors: {}, diputados: {}, representantes: {}, concejales: {} };
       return;
     }
 
@@ -379,11 +408,13 @@ export function consolidateData(): ElectionConsolidated {
     if (cand && currentProv && currentDist && currentCorr) {
       const total = cleanNum(row["Total De Votos Válidos"]);
       
-      if (!res[currentProv]) res[currentProv] = { circuits: {}, mayors: {}, diputados: {}, representantes: {} };
+      if (!res[currentProv]) res[currentProv] = { circuits: {}, mayors: {}, diputados: {}, representantes: {}, concejales: {} };
       if (!res[currentProv].representantes[currentDist]) res[currentProv].representantes[currentDist] = {};
-      if (!res[currentProv].representantes[currentDist][currentCorr]) res[currentProv].representantes[currentDist][currentCorr] = {};
+      if (!res[currentProv].representantes[currentDist][currentCorr]) {
+        res[currentProv].representantes[currentDist][currentCorr] = { candidates: {} };
+      }
 
-      res[currentProv].representantes[currentDist][currentCorr][cand] = {
+      res[currentProv].representantes[currentDist][currentCorr].candidates[cand] = {
         candidate: cand,
         total: total,
         parties: {
@@ -416,6 +447,36 @@ export function consolidateData(): ElectionConsolidated {
       blancos: cleanNum(f["Votos en Blanco"]),
       nulos: cleanNum(f["Votos Nulos"]),
       count: cleanNum(f["Corregimientos"])
+    };
+  });
+
+  // Parse Concejal Data
+  concejalesData.forEach(f => {
+    const p = normalizeProvince(f["Provincia"]);
+    const dist = (f["Distrito"] || "").trim();
+    const cand = (f["Candidato"] || "").trim();
+    
+    if (!p || !dist || !cand) return;
+    
+    if (!res[p]) res[p] = { circuits: {}, mayors: {}, diputados: {}, representantes: {}, concejales: {} };
+    if (!res[p].concejales[dist]) {
+      res[p].concejales[dist] = { candidates: {} };
+    }
+    
+    res[p].concejales[dist].candidates[cand] = {
+      candidate: cand,
+      total: cleanNum(f["Total"]),
+      parties: {
+        "PRD": cleanNum(f["PRD"]),
+        "PP": cleanNum(f["PP"]),
+        "MOLIRENA": cleanNum(f["MOLIRENA"]),
+        "PANAMEÑISTA": cleanNum(f["PANAMEÑISTA"]),
+        "CD": cleanNum(f["CD"]),
+        "ALIANZA": cleanNum(f["ALIANZA"]),
+        "RM": cleanNum(f["RM"]),
+        "PAIS": cleanNum(f["PAIS"]),
+        "MOCA": cleanNum(f["MOCA"])
+      }
     };
   });
 

@@ -40,28 +40,37 @@ const CANDIDATE_COLORS = [
 
 const MayorDetails = ({ district, data, province }: { district: string; data: DistrictMayorData; province: string }) => {
   const sortedCandidates = useMemo(() => {
-    return Object.values(data).sort((a, b) => b.total - a.total);
+    return Object.values(data.candidates).sort((a, b) => b.total - a.total);
   }, [data]);
 
   const districtSummary = useMemo(() => {
-    const totalValidos = Object.values(data).reduce((acc, c) => acc + c.total, 0);
+    if (data.summary) {
+      return {
+        cen: 0,
+        mes: data.summary.mesas,
+        pad: 0,
+        val: data.summary.validos,
+        part: "0"
+      };
+    }
+    const totalValidos = Object.values(data.candidates).reduce((acc, c) => acc + c.total, 0);
     return {
-      cen: 0, // Not available at district level in current data
+      cen: 0,
       mes: 0,
       pad: 0,
       val: totalValidos,
-      part: "0" // Not available
+      part: "0"
     };
   }, [data]);
 
   const exportData = useMemo(() => {
     const cand: Record<string, number> = {};
-    Object.values(data).forEach(c => {
+    Object.values(data.candidates).forEach(c => {
       cand[c.candidate] = c.total;
     });
 
     const party: Record<string, number> = {};
-    Object.values(data).forEach(cand => {
+    Object.values(data.candidates).forEach(cand => {
       Object.entries(cand.parties).forEach(([p, v]) => {
         party[p] = (party[p] || 0) + (v as number);
       });
@@ -97,27 +106,68 @@ const MayorDetails = ({ district, data, province }: { district: string; data: Di
           label="Distrito" 
         />
       </div>
+
+      {data.summary && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Mesas</div>
+            <div className="text-lg font-black text-blue-900">{data.summary.mesas.toLocaleString()}</div>
+          </div>
+          <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Votos Válidos</div>
+            <div className="text-lg font-black text-blue-900">{data.summary.validos.toLocaleString()}</div>
+          </div>
+          <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Blancos</div>
+            <div className="text-lg font-black text-gray-600">{data.summary.blancos.toLocaleString()}</div>
+          </div>
+          <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Nulos</div>
+            <div className="text-lg font-black text-red-600">{data.summary.nulos.toLocaleString()}</div>
+          </div>
+        </div>
+      )}
+      
       <div className="mb-6">
         <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 border-l-4 border-blue-600 pl-2 bg-gray-100 py-1">
           Votos por Candidato - {district}
         </h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
-          {sortedCandidates.map((c) => (
-            <div key={c.candidate} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center min-h-[100px]">
-              <div className="flex flex-wrap justify-center gap-2 mb-3">
-                {Object.entries(c.parties).filter(([, v]) => (v as number) > 0).map(([p]) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          {sortedCandidates.map((c, i) => (
+            <div key={c.candidate} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
+              <div className="relative">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-blue-100 bg-gray-50 flex-shrink-0">
                   <img 
-                    key={p}
-                    src={PARTY_LOGOS[p]} 
-                    alt={p} 
-                    className="w-10 h-7 object-contain shadow-sm border border-gray-100 rounded-sm"
+                    src={CANDIDATE_PHOTOS[c.candidate] || `https://picsum.photos/seed/${c.candidate}/200`} 
+                    alt={c.candidate}
+                    className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
-                    title={p}
                   />
-                ))}
+                </div>
+                <div className="absolute -top-1 -left-1 w-6 h-6 bg-blue-900 text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
+                  #{i + 1}
+                </div>
               </div>
-              <div className="text-lg font-black text-blue-900">
-                {c.total.toLocaleString()}
+              <div className="flex-1 min-w-0">
+                <h5 className="font-bold text-gray-900 leading-tight mb-1 truncate" title={c.candidate}>
+                  {c.candidate}
+                </h5>
+                <div className="flex items-center gap-1 mb-2 overflow-x-auto pb-1 scrollbar-hide">
+                  {Object.entries(c.parties).filter(([, v]) => (v as number) > 0).map(([p]) => (
+                    <img 
+                      key={p}
+                      src={PARTY_LOGOS[p]} 
+                      alt={p} 
+                      className="h-4 object-contain shadow-sm border border-gray-100 rounded-sm"
+                      referrerPolicy="no-referrer"
+                      title={p}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-end justify-between">
+                  <span className="text-xl font-black text-blue-900">{c.total.toLocaleString()}</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Votos</span>
+                </div>
               </div>
             </div>
           ))}
@@ -642,11 +692,20 @@ const DiputadoDetails = ({ circuit, data, province, fullCircuitData }: { circuit
 
 const RepresentanteDetails = ({ district, data, province }: { district: string; data: DistrictMayorData; province: string }) => {
   const sortedCandidates = useMemo(() => {
-    return Object.values(data).sort((a, b) => b.total - a.total);
+    return Object.values(data.candidates).sort((a, b) => b.total - a.total);
   }, [data]);
 
   const districtSummary = useMemo(() => {
-    const totalValidos = Object.values(data).reduce((acc, c) => acc + c.total, 0);
+    if (data.summary) {
+      return {
+        cen: 0,
+        mes: data.summary.mesas,
+        pad: 0,
+        val: data.summary.validos,
+        part: "0"
+      };
+    }
+    const totalValidos = Object.values(data.candidates).reduce((acc, c) => acc + c.total, 0);
     return {
       cen: 0,
       mes: 0,
@@ -658,12 +717,12 @@ const RepresentanteDetails = ({ district, data, province }: { district: string; 
 
   const exportData = useMemo(() => {
     const cand: Record<string, number> = {};
-    Object.values(data).forEach(c => {
+    Object.values(data.candidates).forEach(c => {
       cand[c.candidate] = c.total;
     });
 
     const party: Record<string, number> = {};
-    Object.values(data).forEach(cand => {
+    Object.values(data.candidates).forEach(cand => {
       Object.entries(cand.parties).forEach(([p, v]) => {
         party[p] = (party[p] || 0) + (v as number);
       });
@@ -699,6 +758,27 @@ const RepresentanteDetails = ({ district, data, province }: { district: string; 
           label="Corregimiento" 
         />
       </div>
+
+      {data.summary && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Mesas</div>
+            <div className="text-lg font-black text-blue-900">{data.summary.mesas.toLocaleString()}</div>
+          </div>
+          <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Votos Válidos</div>
+            <div className="text-lg font-black text-blue-900">{data.summary.validos.toLocaleString()}</div>
+          </div>
+          <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Blancos</div>
+            <div className="text-lg font-black text-gray-600">{data.summary.blancos.toLocaleString()}</div>
+          </div>
+          <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Nulos</div>
+            <div className="text-lg font-black text-red-600">{data.summary.nulos.toLocaleString()}</div>
+          </div>
+        </div>
+      )}
       <div className="mb-6">
         <h4 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 border-l-4 border-blue-600 pl-2 bg-gray-100 py-1">
           Distribución de Votos
@@ -796,14 +876,25 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
       if (data.mayors) {
         if (!data.mayorSummary) t.alc = Object.keys(data.mayors).length;
         Object.values(data.mayors).forEach((district: any) => {
-          t.candCount += Object.keys(district).length;
+          t.candCount += Object.keys(district.candidates || {}).length;
           if (!data.mayorSummary) {
-            Object.values(district).forEach((cand: any) => {
+            Object.values(district.candidates || {}).forEach((cand: any) => {
               t.val += cand.total || 0;
             });
           }
         });
         if (!data.mayorSummary) t.emi = t.val;
+      }
+    } else if (category === 'Concejal') {
+      if (data.concejales) {
+        t.alc = Object.keys(data.concejales).length;
+        Object.values(data.concejales).forEach((district: any) => {
+          t.candCount += Object.keys(district.candidates || {}).length;
+          Object.values(district.candidates || {}).forEach((cand: any) => {
+            t.val += cand.total || 0;
+          });
+        });
+        t.emi = t.val;
       }
     } else if (category === 'Representante') {
       if (data.representanteSummary) {
@@ -820,12 +911,14 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
       if (data.representantes) {
         if (!data.representanteSummary) t.alc = Object.keys(data.representantes).length;
         Object.values(data.representantes).forEach((district: any) => {
-          t.candCount += Object.keys(district).length;
-          if (!data.representanteSummary) {
-            Object.values(district).forEach((cand: any) => {
-              t.val += cand.total || 0;
-            });
-          }
+          Object.values(district).forEach((correg: any) => {
+            t.candCount += Object.keys(correg.candidates || {}).length;
+            if (!data.representanteSummary) {
+              Object.values(correg.candidates || {}).forEach((cand: any) => {
+                t.val += cand.total || 0;
+              });
+            }
+          });
         });
         if (!data.representanteSummary) t.emi = t.val;
       }
@@ -900,7 +993,7 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
                 <ExportMenu 
                   province={province} 
                   summary={summary} 
-                  data={category === 'Alcalde' ? data.mayors : category === 'Diputado' ? data.diputados : category === 'Representante' ? data.representantes : data.circuits} 
+                  data={category === 'Alcalde' ? data.mayors : category === 'Diputado' ? data.diputados : category === 'Representante' ? data.representantes : category === 'Concejal' ? data.concejales : data.circuits} 
                 />
               </div>
               <ul className="space-y-3 text-slate-700">
@@ -923,8 +1016,8 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
                   <span className="font-bold">
-                    {category === 'Alcalde' ? 'Distritos:' : category === 'Representante' ? 'Corregimientos:' : 'Circuitos:'}
-                  </span> {category === 'Diputado' ? Object.keys(data.diputados || {}).length : (category === 'Representante' || category === 'Alcalde') ? summary.alc : Object.keys(data.circuits || {}).length}
+                    {category === 'Alcalde' || category === 'Concejal' ? 'Distritos:' : category === 'Representante' ? 'Corregimientos:' : 'Circuitos:'}
+                  </span> {category === 'Diputado' ? Object.keys(data.diputados || {}).length : (category === 'Representante' || category === 'Alcalde' || category === 'Concejal') ? summary.alc : Object.keys(data.circuits || {}).length}
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
@@ -1116,6 +1209,39 @@ const ProvinceCard = ({ province, data, index, category }: ProvinceCardProps) =>
                 ))}
               </div>
             </div>
+          ) : category === 'Concejal' && data.concejales && Object.keys(data.concejales).length > 0 ? (
+            <div className="mt-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <Users className="text-blue-600" /> Distritos
+              </h3>
+              <div className="space-y-2">
+                {Object.keys(data.concejales).map((district) => (
+                  <div key={district} className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => setOpenMayorDistrict(openMayorDistrict === district ? null : district)}
+                      className={cn(
+                        "w-full flex items-center justify-between p-3 text-left font-semibold transition-colors",
+                        openMayorDistrict === district ? "bg-blue-50 text-blue-900" : "bg-white hover:bg-gray-50"
+                      )}
+                    >
+                      <span>{district}</span>
+                      {openMayorDistrict === district ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    </button>
+                    {openMayorDistrict === district && (
+                      <MayorDetails district={district} data={data.concejales[district]} province={province} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : category === 'Concejal' ? (
+            <div className="mt-4 p-8 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+              <BarChart3 size={48} className="mx-auto text-gray-300 mb-4" />
+              <h3 className="text-lg font-bold text-gray-800 mb-2">Datos de Concejales</h3>
+              <p className="text-gray-500 max-w-xs mx-auto">
+                Actualmente no hay datos detallados disponibles para la categoría de Concejales en {province}.
+              </p>
+            </div>
           ) : null}
         </div>
       )}
@@ -1132,7 +1258,7 @@ const ELECTORAL_CATEGORIES = [
 ];
 
 export default function App() {
-  const [activeCategory, setActiveCategory] = useState('Presidente');
+  const [activeCategory, setActiveCategory] = useState('Alcalde');
   const data = useMemo(() => consolidateData(), []);
 
   return (
@@ -1176,9 +1302,10 @@ export default function App() {
             hasData = Object.keys(provinceData.mayors || {}).length > 0;
           } else if (activeCategory === 'Diputado') {
             hasData = Object.keys(provinceData.diputados || {}).length > 0;
-          } else if (activeCategory === 'Representante' || activeCategory === 'Concejal') {
-            // Always show all provinces for these categories as requested
+          } else if (activeCategory === 'Representante') {
             hasData = true;
+          } else if (activeCategory === 'Concejal') {
+            hasData = ["Colón", "Panamá", "Comarca Embera Wounaan", "Comarca Naso Tjër Di"].includes(province);
           }
 
           if (!hasData) return null;
@@ -1205,9 +1332,10 @@ export default function App() {
             hasData = Object.keys(provinceData.mayors || {}).length > 0;
           } else if (activeCategory === 'Diputado') {
             hasData = Object.keys(provinceData.diputados || {}).length > 0;
-          } else if (activeCategory === 'Representante' || activeCategory === 'Concejal') {
-            // Always show all provinces for these categories as requested
+          } else if (activeCategory === 'Representante') {
             hasData = true;
+          } else if (activeCategory === 'Concejal') {
+            hasData = ["Colón", "Panamá", "Comarca Embera Wounaan", "Comarca Naso Tjër Di"].includes(province);
           }
 
           if (!hasData) return null;

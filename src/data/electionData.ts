@@ -7508,3 +7508,54 @@ Comarca Kuna de Wargandí;1;5;5;1,718;1,000;1,200;100;100
 Comarca Naso Tjër Di;3;10;10;2,510;1,600;1,800;100;100
 Comarca Ngäbe Buglé;70;512;512;167,965;105,879;118,037;8,473;3,685
 Comarca Kuna Yala;4;70;70;23,167;18,553;19,758;270;935`;
+
+export const CONCEJAL_CSV = `Provincia;Distrito;Candidato;Total;PRD;PP;MOLIRENA;PANAMEÑISTA;CD;ALIANZA;RM;PAIS;MOCA
+Colón;Omar Torrijos Herrera;Betty Sanchez;300;300;0;0;0;0;0;0;0;0
+Colón;Omar Torrijos Herrera;Noemi Solís Oliveros;318;318;0;0;0;0;0;0;0;0
+Colón;Omar Torrijos Herrera;Victor Vasquez Perez;362;0;0;0;362;0;0;0;0;0
+Colón;Omar Torrijos Herrera;Gabriel Sanchez;325;0;0;0;325;0;0;0;0;0
+Colón;Omar Torrijos Herrera;Iris Gonzalez;395;0;0;0;0;395;0;0;0;0
+Colón;Omar Torrijos Herrera;Jossellin Baltazar;428;0;0;0;0;428;0;0;0;0
+Colón;Omar Torrijos Herrera;Grimaldo Gonzalez;404;0;0;0;0;0;0;404;0;0
+Colón;Omar Torrijos Herrera;William Piti Martinez;515;0;0;0;0;0;0;515;0;0
+Panamá;Taboga;Raúl Varela;587;587;0;0;0;0;0;0;0;0
+Panamá;Taboga;Jose A Prado Dimas;249;0;249;0;0;0;0;0;0;0
+Panamá;Taboga;Emilio Muñoz;592;0;0;0;0;592;0;0;0;0
+Panamá;Taboga;José Chirú;289;0;0;0;0;0;0;289;0;0
+Comarca Embera Wounaan;Cémaco;Neldo Casama Rosales Morfo;1123;1123;0;0;0;0;0;0;0;0
+Comarca Embera Wounaan;Cémaco;Fernando Fogona Dumaza;1314;1314;0;0;0;0;0;0;0;0
+Comarca Embera Wounaan;Cémaco;Briceida Tocamo Rosales;644;0;644;0;0;0;0;0;0;0
+Comarca Embera Wounaan;Cémaco;Siriaco Guaseruca;660;0;660;0;0;0;0;0;0;0
+Comarca Embera Wounaan;Cémaco;Atilio Peña;161;0;0;0;161;0;0;0;0;0
+Comarca Embera Wounaan;Cémaco;Olmedo Chango;843;0;0;0;0;843;0;0;0;0
+Comarca Embera Wounaan;Cémaco;Atilio Peña;736;0;0;0;0;736;0;0;0;0
+Comarca Embera Wounaan;Cémaco;Sixto Casama;170;0;0;0;0;0;170;0;0;0
+Comarca Embera Wounaan;Cémaco;Saturnino Mepaquito;642;0;0;0;0;0;0;642;0;0
+Comarca Embera Wounaan;Cémaco;José Dequia;574;0;0;0;0;0;0;574;0;0
+Comarca Embera Wounaan;Cémaco;Anpolito Itucama Berrugate;91;0;0;0;0;0;0;0;91;0
+Comarca Embera Wounaan;Cémaco;Omar Cansari Bola;230;0;0;0;0;0;0;0;0;230
+Comarca Embera Wounaan;Sambú;Otniel Cuñapa Turra;406;406;0;0;0;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Enoc Barrigón Flaco;394;394;0;0;0;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Zenaida Bariquinuda;462;462;0;0;0;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Erirson Cardena;38;0;38;0;0;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Charles Flaco;41;0;41;0;0;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Edilmo Salas;268;0;0;268;0;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Ordeliano Cabrera;240;0;0;240;0;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Bloiser Córdoba Boro;271;0;0;271;0;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Marxio Degaiza;394;0;0;0;394;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Yunier Rosales;392;0;0;0;392;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Juan Córdoba;400;0;0;0;400;0;0;0;0;0
+Comarca Embera Wounaan;Sambú;Didimo Carpio Cárdenas;36;0;0;0;0;36;0;0;0;0
+Comarca Embera Wounaan;Sambú;Deibys Barqueño;62;0;0;0;0;62;0;0;0;0
+Comarca Embera Wounaan;Sambú;Diego Zatiaza;33;0;0;0;0;33;0;0;0;0
+Comarca Embera Wounaan;Sambú;Jose Machuca;217;0;0;0;0;0;0;217;0;0
+Comarca Embera Wounaan;Sambú;Mendel Flaco;145;0;0;0;0;0;0;145;0;0
+Comarca Embera Wounaan;Sambú;Albertina Cordoba;152;0;0;0;0;0;0;152;0;0
+Comarca Naso Tjër Di;Comarca Naso Tjër Di;Constantino Aguilar;665;665;0;0;0;0;0;0;0;0
+Comarca Naso Tjër Di;Comarca Naso Tjër Di;Aracelys China Sanchez;704;704;0;0;0;0;0;0;0;0
+Comarca Naso Tjër Di;Comarca Naso Tjër Di;Felix Sanchez;440;0;0;0;0;440;0;0;0;0
+Comarca Naso Tjër Di;Comarca Naso Tjër Di;Emerita Sanchez Villagra;649;0;0;0;0;649;0;0;0;0
+Comarca Naso Tjër Di;Comarca Naso Tjër Di;Marcio Bonilla Villagra;105;0;0;0;0;0;0;105;0;0
+Comarca Naso Tjër Di;Comarca Naso Tjër Di;Elias Villagra;100;0;0;0;0;0;0;100;0;0
+Comarca Naso Tjër Di;Comarca Naso Tjër Di;Gabriela Gamarra;71;0;0;0;0;0;0;0;0;71
+`;
